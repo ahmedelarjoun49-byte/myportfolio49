@@ -1,0 +1,117 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --radius: 0.5rem;
+  }
+}
+
+/* ======================================================
+   GLOBAL ZOOM (Portfolio at 102%)
+   Keep it subtle + safe
+====================================================== */
+html {
+  zoom: 1.02;
+}
+
+/* Smooth theme transition */
+html,
+body {
+  transition: background-color 350ms ease, color 350ms ease;
+}
+
+/* Better typography + smooth scroll */
+html {
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  scroll-behavior: smooth;
+}
+
+/* Prevent weird horizontal scroll from transforms */
+body {
+  overflow-x: hidden;
+}
+
+/* Selection (better for both light & dark) */
+::selection {
+  background: rgba(168, 85, 247, 0.28);
+  color: inherit;
+}
+
+/* Tap highlight off (mobile polish) */
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Premium focus ring (accessibility + looks clean) */
+:focus-visible {
+  outline: 2px solid rgba(16, 185, 129, 0.65);
+  outline-offset: 3px;
+  border-radius: 10px;
+}
+
+/* ======================================================
+   Subtle grain (lighter in light mode, slightly stronger in dark)
+====================================================== */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.018; /* lighter than before (was 0.03) */
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  z-index: 9999;
+}
+
+.dark body::after {
+  opacity: 0.03; /* keep richer grain in dark mode */
+}
+
+/* ======================================================
+   Scrollbar (optional but premium)
+====================================================== */
+::-webkit-scrollbar {
+  width: 12px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(15, 23, 42, 0.18);
+  border-radius: 999px;
+  border: 3px solid transparent;
+  background-clip: content-box;
+}
+.dark ::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.18);
+  border: 3px solid transparent;
+  background-clip: content-box;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(15, 23, 42, 0.28);
+  border: 3px solid transparent;
+  background-clip: content-box;
+}
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.28);
+  border: 3px solid transparent;
+  background-clip: content-box;
+}
+
+/* Motion safety */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+@layer utilities {
+  .font-playwrite {
+    font-family: var(--font-playwrite), serif;
+  }
+}
