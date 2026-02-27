@@ -4,25 +4,29 @@ import { useEffect, useState } from "react";
 import {
   motion,
   AnimatePresence,
+  useScroll,
   useSpring,
-  useTransform,
+  useMotionTemplate,
   type Variants,
 } from "framer-motion";
 import Link from "next/link";
-import { Download, ArrowUpRight } from "lucide-react"; 
+import { Download, Code2, Cpu, Palette, Box, ArrowUpRight } from "lucide-react"; 
 import { Typewriter } from "react-simple-typewriter";
-import Image from "next/image";
 
-// Components
 import Header from "@/components/Header";
 import Preloader from "@/components/Preloader";
+import ProfilePhoto from "@/components/ProfilePhoto";
 import Experience from "@/components/Experience";
 import ProjectBanner from "@/components/ProjectBanner";
 import Skils from "@/components/Skils";
 import MyStory from "@/components/MyStory_temp";
-import GraduationHero from "@/components/GraduationScrollVideo"; 
+import GraduationScrollVideo from "@/components/GraduationScrollVideo";
 
-const PROFILE_PNG = "/mypicture.png";
+// PNG Path - Ensure this file exists in your public folder
+const PROFILE_SRC = "/mypicture.png";
+const HERO_BG_VIDEO_SRC = "/stars.mp4";
+
+const easeOut = [0.22, 1, 0.36, 1] as const;
 
 const container: Variants = {
   hidden: { opacity: 0 },
@@ -30,51 +34,61 @@ const container: Variants = {
 };
 
 const rise: Variants = {
-  hidden: { opacity: 0, y: 40, filter: "blur(10px)" },
+  hidden: { opacity: 0, y: 30, filter: "blur(15px)" },
   show: {
     opacity: 1,
     y: 0,
     filter: "blur(0px)",
-    transition: { duration: 0.8 },
+    transition: { duration: 0.8, ease: easeOut },
   },
 };
 
-const characterEntrance: Variants = {
-  hidden: { opacity: 0, x: 50, scale: 0.95 },
-  show: {
-    opacity: 1,
-    x: 0,
-    scale: 1,
-    transition: { duration: 1, delay: 0.5 },
-  },
-};
+function SubtleGrid() {
+  return (
+    <div className="absolute inset-0 pointer-events-none overflow-hidden">
+      <div
+        className="absolute inset-0 opacity-[0.10]"
+        style={{
+          backgroundImage:
+            "radial-gradient(circle at 2px 2px, rgba(59,130,246,0.15) 1px, transparent 0)",
+          backgroundSize: "40px 40px",
+        }}
+      />
+    </div>
+  );
+}
 
 export default function HomeClient() {
   const [loading, setLoading] = useState(true);
-  const [mounted, setMounted] = useState(false);
-  
-  // High-performance springs for the 3D tilt effect
-  const mouseX = useSpring(0, { stiffness: 100, damping: 30 });
-  const mouseY = useSpring(0, { stiffness: 100, damping: 30 });
+  useScroll();
 
-  // Map mouse movement to rotation degrees
-  const rotateX = useTransform(mouseY, [-500, 500], [7, -7]);
-  const rotateY = useTransform(mouseX, [-500, 500], [-7, 7]);
+  const mouseX = useSpring(0, { stiffness: 500, damping: 50 });
+  const mouseY = useSpring(0, { stiffness: 500, damping: 50 });
 
-  // Parallax background movement for the blurred PNG
-  const bgX = useTransform(mouseX, [-500, 500], [20, -20]);
-  const bgY = useTransform(mouseY, [-500, 500], [20, -20]);
+  function handleMouseMove({
+    clientX,
+    clientY,
+    currentTarget,
+  }: React.MouseEvent) {
+    const { left, top } = currentTarget.getBoundingClientRect();
+    mouseX.set(clientX - left);
+    mouseY.set(clientY - top);
+  }
 
   useEffect(() => {
-    setMounted(true);
     const t = setTimeout(() => setLoading(false), 900);
     return () => clearTimeout(t);
   }, []);
 
-  if (!mounted) return null;
+  const stackIcons = [
+    { icon: <Code2 size={22} />, label: "React" },
+    { icon: <Cpu size={22} />, label: "TypeScript" },
+    { icon: <Palette size={22} />, label: "Tailwind" },
+    { icon: <Box size={22} />, label: "3D" },
+  ];
 
   return (
-    <div className="transition-colors duration-300 selection:bg-blue-600/30 overflow-x-hidden">
+    <div className="transition-colors duration-300 selection:bg-blue-500/30">
       <AnimatePresence>{loading && <Preloader />}</AnimatePresence>
 
       <Header />
@@ -82,102 +96,141 @@ export default function HomeClient() {
       <div className="dark bg-black text-white">
         <section
           id="home"
-          onMouseMove={(e) => {
-            const { left, top, width, height } = e.currentTarget.getBoundingClientRect();
-            mouseX.set(e.clientX - left - width / 2);
-            mouseY.set(e.clientY - top - height / 2);
-          }}
-          className="relative min-h-screen flex items-center justify-center overflow-hidden"
+          onMouseMove={handleMouseMove}
+          className="relative min-h-screen flex items-center justify-center overflow-hidden pt-10"
         >
-          {/* BACKGROUND LAYER: BLURRED PNG NUANCE */}
-          <div className="absolute inset-0 z-0 bg-black">
-            <motion.div 
-              style={{ x: bgX, y: bgY, scale: 1.1 }}
-              className="absolute inset-0 opacity-20 blur-[100px] pointer-events-none"
-            >
-               <Image 
-                src={PROFILE_PNG} 
-                alt="Background Aesthetic" 
-                fill 
-                className="object-cover object-center grayscale"
-              />
-            </motion.div>
-
-            {/* Glowing Orbs */}
-            <div className="absolute top-[-15%] left-[-10%] w-[80%] h-[80%] bg-blue-900/20 blur-[150px] rounded-full" />
-            <div className="absolute bottom-[-10%] right-[-5%] w-[60%] h-[60%] bg-blue-600/10 blur-[120px] rounded-full" />
-            <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-transparent to-black" />
+          {/* BACKGROUND LAYER */}
+          <div className="absolute inset-0 z-0">
+            <video
+              className="absolute inset-0 h-full w-full object-cover opacity-60 scale-105"
+              src={HERO_BG_VIDEO_SRC}
+              autoPlay
+              muted
+              loop
+              playsInline
+            />
+            <div className="absolute inset-0 bg-black/40 backdrop-blur-[1px]" />
+            <motion.div
+              className="pointer-events-none absolute inset-0 z-10 opacity-60"
+              style={{
+                background: useMotionTemplate`
+                  radial-gradient(
+                    800px circle at ${mouseX}px ${mouseY}px,
+                    rgba(37, 99, 235, 0.15),
+                    transparent 80%
+                  )
+                `,
+              }}
+            />
+            <SubtleGrid />
           </div>
 
-          <main className="relative z-20 container mx-auto px-6 md:px-12 max-w-[1500px]">
+          <main className="relative z-20 container mx-auto px-6 md:px-12 max-w-6xl">
             <motion.div
               initial="hidden"
               animate={loading ? "hidden" : "show"}
               variants={container}
-              className="grid grid-cols-1 lg:grid-cols-[0.9fr_1.1fr] gap-10 items-center min-h-screen"
+              className="grid grid-cols-1 lg:grid-cols-[1fr_1fr] gap-12 items-center"
             >
-              {/* TEXT CONTENT */}
-              <div className="space-y-10 text-center lg:text-left z-30 pt-32 lg:pt-0">
-                <motion.div variants={rise} className="space-y-6">
-                  <h2 className="text-xl text-blue-500 font-bold tracking-[0.5em] uppercase opacity-90">
-                    Ahmed El Arjoun
+              {/* TEXT SIDE - RESTORED EXACTLY */}
+              <div className="space-y-8 text-center lg:text-left z-30">
+                <motion.div variants={rise} className="space-y-4">
+                  <h2 className="text-lg md:text-xl text-white/60 font-light tracking-wide">
+                    Hey, I&apos;m{" "}
+                    <span className="text-white font-medium">Ahmed El Arjoun</span>
                   </h2>
 
-                  <h1 className="text-6xl md:text-8xl lg:text-[115px] font-black leading-[0.85] tracking-tighter text-white">
-                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-300 via-blue-500 to-blue-800 drop-shadow-[0_0_35px_rgba(37,99,235,0.4)]">
-                      WEB
+                  <h1 className="text-6xl md:text-7xl lg:text-8xl font-black leading-[1.1] tracking-tighter text-white">
+                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-blue-700 drop-shadow-[0_0_15px_rgba(37,99,235,0.4)]">
+                      Web
                     </span>
-                    <br />
-                    <span className="relative inline-block h-[1.1em]">
+                    
+                    <span className="block">
                       <Typewriter
-                        words={["FRONTEND", "CREATIVE", "DEVELOPER"]}
+                        words={["Developer", "Front-end", "Back-end", "Junior BE"]}
                         loop={0}
                         cursor
                         cursorStyle="_"
-                        typeSpeed={70}
+                        typeSpeed={50}
+                        deleteSpeed={30}
+                        delaySpeed={1500}
                       />
                     </span>
-                  </h1>
 
-                  <div className="pt-2">
-                     <span className="text-2xl md:text-4xl font-extrabold tracking-[0.25em] text-zinc-800 uppercase italic">
+                    <div className="relative inline-block mt-4">
+                      <motion.div 
+                        initial={{ backgroundPosition: "-200% 0" }}
+                        animate={{ backgroundPosition: "200% 0" }}
+                        transition={{ duration: 5, repeat: Infinity, ease: "linear" }}
+                        className="text-xl md:text-3xl font-bold tracking-[0.35em] uppercase text-transparent bg-clip-text bg-[linear-gradient(110deg,#444,45%,#fff,55%,#444)] bg-[length:200%_100%] drop-shadow-[0_0_8px_rgba(255,255,255,0.3)]"
+                      >
                         & Multimedia 3D
-                     </span>
-                  </div>
+                      </motion.div>
+                    </div>
+                  </h1>
                 </motion.div>
 
-                <motion.p variants={rise} className="text-xl text-zinc-500 max-w-lg mx-auto lg:mx-0 leading-relaxed font-medium">
-                  Developing high-performance web solutions and immersive 3D multimedia experiences with clean, modern engineering.
+                <motion.p
+                  variants={rise}
+                  className="text-base md:text-lg text-white/50 max-w-md mx-auto lg:mx-0 leading-relaxed"
+                >
+                  I build modern, responsive, user-centric web experiences —
+                  focused on clean UI/UX and performance.
                 </motion.p>
 
-                <motion.div variants={rise} className="flex flex-col sm:flex-row gap-6 justify-center lg:justify-start pt-4">
-                  <Link href="/contact" className="group px-12 py-6 rounded-2xl bg-blue-600 text-white font-black transition-all hover:scale-105 shadow-[0_20px_50px_-10px_rgba(37,99,235,0.6)] flex items-center justify-center gap-4 uppercase tracking-widest text-xs">
-                    Get In Touch <ArrowUpRight size={20} className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
+                {/* ICONS */}
+                <motion.div
+                  variants={rise}
+                  className="flex flex-wrap gap-4 justify-center lg:justify-start"
+                >
+                  {stackIcons.map((item, idx) => (
+                    <div
+                      key={idx}
+                      className="flex items-center justify-center w-12 h-12 rounded-xl bg-white/5 border border-white/10 text-white/40 hover:text-blue-500 hover:border-blue-500/50 hover:bg-blue-500/5 transition-all duration-300"
+                    >
+                      {item.icon}
+                    </div>
+                  ))}
+                </motion.div>
+
+                <motion.div
+                  variants={rise}
+                  className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start pt-2"
+                >
+                  <Link
+                    href="/contact"
+                    className="px-8 py-4 rounded-xl bg-blue-600 text-white font-bold transition-all hover:scale-105 shadow-lg shadow-blue-900/40 text-center uppercase tracking-widest text-[10px] flex items-center justify-center gap-2"
+                  >
+                    Get In Touch <ArrowUpRight size={14} />
                   </Link>
-                  <Link href="/cv1.pdf" className="px-12 py-6 rounded-2xl border border-white/10 bg-white/5 backdrop-blur-3xl text-white font-bold hover:bg-white/10 transition-all uppercase tracking-widest text-xs flex items-center justify-center gap-4">
-                    <Download size={20} /> Download CV
+
+                  <Link
+                    href="/cv1.pdf"
+                    className="px-8 py-4 rounded-xl border border-white/10 bg-white/5 backdrop-blur-xl text-white font-semibold flex items-center justify-center gap-2 hover:bg-white/10 transition-all uppercase tracking-widest text-[10px]"
+                  >
+                    <Download size={14} /> Download CV
                   </Link>
                 </motion.div>
               </div>
 
-              {/* INTERACTIVE CHARACTER SIDE */}
+              {/* PHOTO SIDE - PNG ENHANCEMENT */}
               <motion.div
-                variants={characterEntrance}
-                style={{ rotateX, rotateY, transformStyle: "preserve-3d" }}
-                className="relative flex justify-center lg:justify-end items-end h-[85vh] lg:h-screen pt-10 lg:pt-0"
+                variants={rise}
+                className="relative flex justify-end items-end h-full self-end lg:h-[80vh]"
               >
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[130%] h-[80%] bg-blue-600/15 blur-[160px] rounded-full pointer-events-none -z-10" />
-
-                <div className="relative w-full h-[95%] flex items-end">
-                  <Image
-                    src={PROFILE_PNG}
+                {/* Subject-aware Glow behind PNG */}
+                <div className="absolute bottom-1/4 right-0 w-[500px] h-[500px] bg-blue-600/10 rounded-full blur-[120px] pointer-events-none" />
+                
+                <div className="relative z-20 w-full flex justify-end items-end">
+                  {/* PNG Image filling vertical space */}
+                  <img
+                    src={PROFILE_SRC}
                     alt="Ahmed Portrait"
-                    fill
-                    className="object-contain object-bottom drop-shadow-[0_50px_120px_rgba(37,99,235,0.4)] brightness-110"
-                    priority
-                    quality={100}
+                    className="w-auto h-[60vh] lg:h-[85vh] max-w-none object-contain object-bottom drop-shadow-[0_0_25px_rgba(37,99,235,0.25)]"
                   />
-                  <div className="absolute inset-x-0 bottom-0 h-56 bg-gradient-to-t from-black via-black/30 to-transparent z-20 pointer-events-none" />
+                  
+                  {/* Bottom Fade to blend PNG with background */}
+                  <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-black via-black/40 to-transparent" />
                 </div>
               </motion.div>
             </motion.div>
@@ -185,14 +238,8 @@ export default function HomeClient() {
         </section>
       </div>
 
-      {/* LOWER SECTIONS */}
       <div className="relative z-30">
-        <GraduationHero 
-          videoSrc="/grad.mp4" 
-          src={PROFILE_PNG} 
-          staticBgSrc="/photooos/micro3.png"
-        />
-        
+        <GraduationScrollVideo src={PROFILE_SRC} />
         <div id="experience" className="py-20">
           <Experience />
         </div>
