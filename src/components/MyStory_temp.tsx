@@ -11,7 +11,7 @@ import {
   useSpring,
   AnimatePresence
 } from "framer-motion";
-import { Maximize2, PlayCircle } from "lucide-react";
+import { Maximize2 } from "lucide-react";
 
 interface Internship {
   label: string;
@@ -20,7 +20,7 @@ interface Internship {
   location: string;
   description: string;
   preview: string;
-  videoUrl?: string; // Enhanced for YouTube support
+  videoUrl?: string; 
   tags: string[];
   proofs?: { src: string; alt: string }[];
 }
@@ -87,7 +87,6 @@ export default function MyStory() {
     >
       <motion.div className="absolute inset-0 pointer-events-none z-10" style={{ background: spotlight }} />
 
-      {/* --- LIGHTBOX MODAL --- */}
       <AnimatePresence>
         {selectedProof && (
           <motion.div 
@@ -144,22 +143,56 @@ function InternshipCard({ item, index, onOpenProof }: {
   const cardRef = useRef<HTMLDivElement>(null);
   const isVideoLeft = index % 2 !== 0;
 
-  const { scrollYProgress } = useScroll({ target: cardRef, offset: ["start end", "end start"] });
+  const { scrollYProgress } = useScroll({ 
+    target: cardRef, 
+    offset: ["start end", "end start"] 
+  });
+
   const cardOpacity = useTransform(scrollYProgress, [0.1, 0.3, 0.8, 0.9], [0, 1, 1, 0]);
   const cardScale = useTransform(scrollYProgress, [0.1, 0.3], [0.92, 1]);
 
+  // --- PC Dynamic Transformations ---
+  // Moves right as you scroll down
+  const pcX = useTransform(scrollYProgress, [0, 1], [0, 150]); 
+  // Grows significantly bigger
+  const pcSizeScale = useTransform(scrollYProgress, [0, 1], [0.8, 1.8]);
+  // Intensifies blur as it moves/scales
+  const pcBlur = useTransform(scrollYProgress, [0.4, 1], [0, 15]);
+  const pcBlurFilter = useMotionTemplate`blur(${pcBlur}px)`;
+
   return (
     <motion.div ref={cardRef} style={{ opacity: cardOpacity, scale: cardScale }} className="relative w-full flex items-center">
+      
+      {/* --- ASUS PC BACKGROUND EFFECT --- */}
+      {item.company === "Next Level" && (
+        <motion.div 
+          style={{ 
+            x: pcX, 
+            scale: pcSizeScale,
+            filter: pcBlurFilter
+          }}
+          className="absolute -top-40 -right-40 w-[800px] h-[800px] opacity-30 dark:opacity-60 pointer-events-none z-0 hidden lg:block"
+        >
+          <Image 
+            src="/pictures/asus.png" 
+            alt="Asus ROG Background" 
+            fill 
+            className="object-contain"
+            style={{
+                maskImage: 'radial-gradient(circle, black 30%, transparent 80%)',
+                WebkitMaskImage: 'radial-gradient(circle, black 30%, transparent 80%)'
+            }}
+          />
+        </motion.div>
+      )}
+
       <div className="relative z-20 w-full grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-20 items-center">
-        
-        {/* Media Side */}
         <div className={`lg:col-span-7 ${isVideoLeft ? 'lg:order-2' : 'lg:order-1'}`}>
           <div className="group relative aspect-video rounded-[2rem] overflow-hidden border border-zinc-200 dark:border-blue-500/30 shadow-2xl bg-zinc-100 dark:bg-black">
             <MediaDisplay videoUrl={item.videoUrl} preview={item.preview} title={item.title} />
           </div>
         </div>
 
-        {/* Text Side */}
         <div className={`lg:col-span-5 ${isVideoLeft ? 'lg:order-1' : 'lg:order-2'}`}>
           <div className="space-y-8">
             <div className="space-y-4">
@@ -167,18 +200,14 @@ function InternshipCard({ item, index, onOpenProof }: {
                 <span className="w-1.5 h-1.5 rounded-full bg-blue-600 animate-pulse" />
                 {item.label}
               </span>
-
               <h2 className="text-4xl md:text-5xl font-black text-zinc-900 dark:text-white tracking-tight">{item.title}</h2>
-              
               <div className="flex flex-col gap-1">
                 <p className="text-blue-600 dark:text-blue-500 font-extrabold text-sm uppercase tracking-wider">{item.company}</p>
                 <p className="text-zinc-400 dark:text-zinc-500 text-xs font-medium uppercase tracking-widest">{item.location}</p>
               </div>
             </div>
-
             <p className="text-zinc-600 dark:text-zinc-400 text-lg leading-relaxed">{item.description}</p>
 
-            {/* Proofs Section */}
             {item.proofs && (
               <div className="pt-4 space-y-4">
                 <p className="text-[10px] font-black text-zinc-400 dark:text-zinc-500 uppercase tracking-[0.2em]">Validation & Recognition</p>
@@ -214,7 +243,6 @@ function InternshipCard({ item, index, onOpenProof }: {
   );
 }
 
-// Sub-component to handle YouTube Embed vs Local Assets
 function MediaDisplay({ videoUrl, preview, title }: { videoUrl?: string; preview: string; title: string }) {
   if (videoUrl?.includes("youtube.com") || videoUrl?.includes("youtu.be")) {
     const videoId = videoUrl.includes("v=") ? videoUrl.split("v=")[1].split("&")[0] : videoUrl.split("/").pop();
@@ -222,15 +250,13 @@ function MediaDisplay({ videoUrl, preview, title }: { videoUrl?: string; preview
       <iframe
         src={`https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&loop=1&playlist=${videoId}&controls=0&modestbranding=1`}
         title={title}
-        className="w-full h-full scale-105 pointer-events-none" // Scaled slightly to hide edges
+        className="w-full h-full scale-105 pointer-events-none" 
         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
       />
     );
   }
-
   if (videoUrl) {
     return <video src={videoUrl} autoPlay muted loop playsInline className="w-full h-full object-cover" />;
   }
-
   return <Image src={preview} alt={title} fill className="object-cover group-hover:scale-105 transition-transform duration-700" />;
 }

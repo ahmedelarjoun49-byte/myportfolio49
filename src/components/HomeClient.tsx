@@ -7,11 +7,13 @@ import {
   useScroll,
   useSpring,
   useMotionTemplate,
+  useTransform,
   type Variants,
 } from "framer-motion";
 import Link from "next/link";
 import { Download, Code2, Cpu, Palette, Box, ArrowUpRight } from "lucide-react"; 
 import { Typewriter } from "react-simple-typewriter";
+import Image from "next/image";
 
 import Header from "@/components/Header";
 import Preloader from "@/components/Preloader";
@@ -22,7 +24,7 @@ import Skils from "@/components/Skils";
 import MyStory from "@/components/MyStory_temp";
 import GraduationScrollVideo from "@/components/GraduationScrollVideo";
 
-const PROFILE_SRC = "/mee.jpg";
+const PROFILE_PNG = "/mypicture.png";
 const HERO_BG_VIDEO_SRC = "/stars.mp4";
 
 const easeOut = [0.22, 1, 0.36, 1] as const;
@@ -42,36 +44,23 @@ const rise: Variants = {
   },
 };
 
-function SubtleGrid() {
-  return (
-    <div className="absolute inset-0 pointer-events-none overflow-hidden">
-      <div
-        className="absolute inset-0 opacity-[0.10]"
-        style={{
-          backgroundImage:
-            "radial-gradient(circle at 2px 2px, rgba(59,130,246,0.15) 1px, transparent 0)",
-          backgroundSize: "40px 40px",
-        }}
-      />
-    </div>
-  );
-}
-
 export default function HomeClient() {
   const [loading, setLoading] = useState(true);
-  useScroll();
+  
+  // High-performance springs for the tilt effect
+  const mouseX = useSpring(0, { stiffness: 150, damping: 20 });
+  const mouseY = useSpring(0, { stiffness: 150, damping: 20 });
 
-  const mouseX = useSpring(0, { stiffness: 500, damping: 50 });
-  const mouseY = useSpring(0, { stiffness: 500, damping: 50 });
+  // Map mouse position to tilt degrees
+  const rotateX = useTransform(mouseY, [-500, 500], [5, -5]);
+  const rotateY = useTransform(mouseX, [-500, 500], [-5, 5]);
 
-  function handleMouseMove({
-    clientX,
-    clientY,
-    currentTarget,
-  }: React.MouseEvent) {
-    const { left, top } = currentTarget.getBoundingClientRect();
-    mouseX.set(clientX - left);
-    mouseY.set(clientY - top);
+  function handleMouseMove({ clientX, clientY, currentTarget }: React.MouseEvent) {
+    const { left, top, width, height } = currentTarget.getBoundingClientRect();
+    const x = clientX - left - width / 2;
+    const y = clientY - top - height / 2;
+    mouseX.set(x);
+    mouseY.set(y);
   }
 
   useEffect(() => {
@@ -96,140 +85,98 @@ export default function HomeClient() {
         <section
           id="home"
           onMouseMove={handleMouseMove}
-          className="relative min-h-screen flex items-center justify-center overflow-hidden pt-10"
+          className="relative min-h-screen flex items-center justify-center overflow-hidden"
         >
-          {/* BACKGROUND LAYER */}
+          {/* BACKGROUND ENGINE */}
           <div className="absolute inset-0 z-0">
             <video
-              className="absolute inset-0 h-full w-full object-cover opacity-60 scale-105"
+              className="absolute inset-0 h-full w-full object-cover opacity-50 scale-110"
               src={HERO_BG_VIDEO_SRC}
-              autoPlay
-              muted
-              loop
-              playsInline
+              autoPlay muted loop playsInline preload="auto"
             />
-            <div className="absolute inset-0 bg-black/40 backdrop-blur-[1px]" />
-            <motion.div
-              className="pointer-events-none absolute inset-0 z-10 opacity-60"
-              style={{
-                background: useMotionTemplate`
-                  radial-gradient(
-                    800px circle at ${mouseX}px ${mouseY}px,
-                    rgba(37, 99, 235, 0.15),
-                    transparent 80%
-                  )
-                `,
-              }}
-            />
-            <SubtleGrid />
+            {/* Dark vignette to focus eye on center */}
+            <div className="absolute inset-0 bg-radial-vignette from-transparent to-black" />
           </div>
 
-          <main className="relative z-20 container mx-auto px-6 md:px-12 max-w-6xl">
+          <main className="relative z-20 container mx-auto px-6 md:px-12 max-w-[1400px]">
             <motion.div
               initial="hidden"
               animate={loading ? "hidden" : "show"}
               variants={container}
-              className="grid grid-cols-1 lg:grid-cols-[1.1fr_0.9fr] gap-12 items-center"
+              className="grid grid-cols-1 lg:grid-cols-2 gap-4 items-center min-h-screen"
             >
               {/* TEXT SIDE */}
-              <div className="space-y-8 text-center lg:text-left z-30">
+              <div className="space-y-8 text-center lg:text-left z-30 pt-20 lg:pt-0">
                 <motion.div variants={rise} className="space-y-4">
-                  <h2 className="text-lg md:text-xl text-white/60 font-light tracking-wide">
-                    Hey, I&apos;m{" "}
-                    <span className="text-white font-medium">Ahmed El Arjoun</span>
+                  <h2 className="text-xl text-blue-400/80 font-medium tracking-[0.2em] uppercase">
+                    Ahmed El Arjoun
                   </h2>
 
-                  <h1 className="text-6xl md:text-7xl lg:text-8xl font-black leading-[1.1] tracking-tighter text-white">
-                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-blue-700 drop-shadow-[0_0_15px_rgba(37,99,235,0.4)]">
-                      Web
+                  <h1 className="text-7xl md:text-8xl lg:text-[110px] font-black leading-[0.9] tracking-tighter text-white">
+                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-blue-600">
+                      WEB
                     </span>
-                    
-                    <span className="block">
+                    <br />
+                    <span className="relative">
                       <Typewriter
-                        words={["Creative", "Frontend", "Developer"]}
+                        words={["FRONTEND", "CREATIVE", "DEVELOPER"]}
                         loop={0}
                         cursor
                         cursorStyle="_"
                         typeSpeed={50}
                       />
                     </span>
-
-                    <div className="relative inline-block mt-4">
-                      <motion.div 
-                        initial={{ backgroundPosition: "-200% 0" }}
-                        animate={{ backgroundPosition: "200% 0" }}
-                        transition={{ duration: 5, repeat: Infinity, ease: "linear" }}
-                        className="text-xl md:text-3xl font-bold tracking-[0.35em] uppercase text-transparent bg-clip-text bg-[linear-gradient(110deg,#444,45%,#fff,55%,#444)] bg-[length:200%_100%] drop-shadow-[0_0_8px_rgba(255,255,255,0.3)]"
-                      >
-                        & Multimedia 3D
-                      </motion.div>
-                    </div>
                   </h1>
+
+                  <div className="pt-4">
+                     <span className="text-2xl md:text-4xl font-bold tracking-[0.1em] text-white/40 italic">
+                        & Multimedia 3D
+                     </span>
+                  </div>
                 </motion.div>
 
-                <motion.p
-                  variants={rise}
-                  className="text-base md:text-lg text-white/50 max-w-md mx-auto lg:mx-0 leading-relaxed"
-                >
-                  I build modern, responsive, user-centric web experiences —
-                  focused on clean UI/UX and performance.
+                <motion.p variants={rise} className="text-lg text-white/50 max-w-lg mx-auto lg:mx-0 leading-relaxed">
+                  Crafting immersive digital experiences through clean code and 3D animation. 
+                  Focused on high-performance interfaces that tell a story.
                 </motion.p>
 
-                {/* ICONS */}
-                <motion.div
-                  variants={rise}
-                  className="flex flex-wrap gap-4 justify-center lg:justify-start"
-                >
-                  {stackIcons.map((item, idx) => (
-                    <div
-                      key={idx}
-                      className="flex items-center justify-center w-12 h-12 rounded-xl bg-white/5 border border-white/10 text-white/40 hover:text-blue-500 hover:border-blue-500/50 hover:bg-blue-500/5 transition-all duration-300"
-                    >
-                      {item.icon}
-                    </div>
-                  ))}
-                </motion.div>
-
-                <motion.div
-                  variants={rise}
-                  className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start pt-2"
-                >
-                  <Link
-                    href="/contact"
-                    className="px-8 py-4 rounded-xl bg-blue-600 text-white font-bold transition-all hover:scale-105 shadow-lg shadow-blue-900/40 text-center uppercase tracking-widest text-[10px] flex items-center justify-center gap-2"
-                  >
-                    Get In Touch <ArrowUpRight size={14} />
+                <motion.div variants={rise} className="flex flex-col sm:flex-row gap-6 justify-center lg:justify-start pt-6">
+                  <Link href="/contact" className="group px-10 py-5 rounded-full bg-blue-600 text-white font-bold transition-all hover:bg-blue-500 shadow-[0_0_30px_rgba(37,99,235,0.3)] flex items-center justify-center gap-3 uppercase tracking-widest text-xs">
+                    Let's Talk <ArrowUpRight size={18} className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
                   </Link>
-
-                  <Link
-                    href="/cv1.pdf"
-                    className="px-8 py-4 rounded-xl border border-white/10 bg-white/5 backdrop-blur-xl text-white font-semibold flex items-center justify-center gap-2 hover:bg-white/10 transition-all uppercase tracking-widest text-[10px]"
-                  >
-                    <Download size={14} /> Download CV
+                  <Link href="/cv1.pdf" className="px-10 py-5 rounded-full border border-white/10 bg-white/5 backdrop-blur-md text-white font-bold hover:bg-white/10 transition-all uppercase tracking-widest text-xs flex items-center justify-center gap-3">
+                    <Download size={18} /> Resume
                   </Link>
                 </motion.div>
               </div>
 
-              {/* PHOTO SIDE - CLEAN SINGLE GLOW FIX */}
+              {/* GIANT PHOTO SIDE */}
               <motion.div
                 variants={rise}
-                className="flex justify-center lg:justify-end items-center"
+                style={{ rotateX, rotateY, transformStyle: "preserve-3d" }}
+                className="relative flex justify-center lg:justify-end items-end h-full pt-10 lg:pt-0"
               >
-                <div className="relative group w-full max-w-[340px] lg:max-w-[380px]">
-                  {/* Outer Diffuse Royale Blue Glow */}
-                  <div className="absolute -inset-1 bg-blue-600/40 rounded-[2.5rem] blur-xl opacity-40 group-hover:opacity-100 transition-opacity duration-700" />
-                  
-                  {/* THE CLEAN CONTOUR (Single Line Appearance) */}
-                  <div className="absolute -inset-[2px] rounded-[2.5rem] bg-gradient-to-tr from-blue-700 to-blue-400 opacity-50 group-hover:opacity-100 blur-[1px] transition-all duration-500" />
+                {/* Massive Radial Glow behind the character */}
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-blue-600/20 blur-[150px] rounded-full z-0" />
 
-                  <div className="relative aspect-[4/5] w-full rounded-[2.4rem] overflow-hidden bg-neutral-900 shadow-2xl transition-transform duration-500 group-hover:scale-[1.01] z-20">
-                    <div className="absolute inset-0">
-                      <ProfilePhoto src={PROFILE_SRC} alt="Ahmed" />
-                    </div>
-                    {/* Dark Blue Overlay for Depth */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-blue-950/80 via-transparent to-transparent pointer-events-none" />
-                  </div>
-                </div>
+                <motion.div 
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 1.2, delay: 0.5 }}
+                  className="relative z-10 w-full h-[70vh] lg:h-[90vh] flex items-end"
+                >
+                  <Image
+                    src={PROFILE_PNG}
+                    alt="Ahmed El Arjoun"
+                    fill
+                    className="object-contain object-bottom drop-shadow-[0_10px_80px_rgba(37,99,235,0.25)] filter brightness-110"
+                    priority
+                    quality={100}
+                  />
+                  
+                  {/* Bottom Fade to blend feet with the blackness */}
+                  <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-black via-transparent to-transparent z-20" />
+                </motion.div>
               </motion.div>
             </motion.div>
           </main>
@@ -237,7 +184,7 @@ export default function HomeClient() {
       </div>
 
       <div className="relative z-30">
-        <GraduationScrollVideo src={PROFILE_SRC} />
+        <GraduationScrollVideo src={PROFILE_PNG} />
         <div id="experience" className="py-20">
           <Experience />
         </div>
