@@ -14,73 +14,64 @@ import {
 
 type Props = {
   src?: string;
-  videoSrc?: string;
+  initialBgSrc?: string;
   staticBgSrc?: string;
-  title?: string;
   subtitle?: string;
   year?: string;
 };
 
-// Helper to clamp values between 0 and 1
 function clamp01(v: number) {
   return Math.max(0, Math.min(1, v));
 }
 
-// Hook for staggered line reveal based on scroll progress
-function useLineReveal(p: MotionValue<number>, i: number, base = 0.25, step = 0.05) {
+function useLineReveal(p: MotionValue<number>, i: number, base = 0.35, step = 0.05) {
   const start = base + i * step;
   const end = start + 0.1;
   const t = useTransform(p, (v) => clamp01((v - start) / (end - start)));
 
   return {
     opacity: useTransform(t, [0, 1], [0, 1]),
-    y: useTransform(t, [0, 1], [15, 0]),
-    filter: useTransform(t, [0, 0.9, 1], ["blur(8px)", "blur(0px)", "blur(0px)"]),
+    y: useTransform(t, [0, 1], [10, 0]),
+    filter: useTransform(t, [0, 0.8, 1], ["blur(4px)", "blur(0px)", "blur(0px)"]),
   };
 }
 
 export default function GraduationHero({
   src = "/mypicture.png", 
-  videoSrc = "/grad.mp4",
+  initialBgSrc = "/pictures/avatar11.jpg", 
   staticBgSrc = "/photooos/micro3.png", 
-  title = "GRADUATION",
   subtitle = "Licence • Développement Multimédia 3D & Web",
   year = "2025",
 }: Props) {
   const reduceMotion = useReducedMotion();
   const containerRef = useRef<HTMLElement | null>(null);
 
-  // Track scroll progress within this specific section
   const { scrollYProgress } = useScroll({
     target: containerRef,
     offset: ["start start", "end end"],
   });
 
-  // Smooth out the scroll value for cinematic feel
   const p = useSpring(scrollYProgress, {
     stiffness: 100,
     damping: 30,
-    restDelta: 0.0001,
+    restDelta: 0.001,
   });
 
-  // --- TRANSITION LOGIC ---
-  // Video fades out and scales up
-  const videoOpacity = useTransform(p, [0, 0.45], [1, 0]);
-  const videoScale = useTransform(p, [0, 0.5], [1, 1.1]);
-  const videoBlur = useTransform(p, [0, 0.4], [0, 10]);
+  const initialOpacity = useTransform(p, [0, 0.3], [1, 0]);
+  const initialScale = useTransform(p, [0, 0.3], [1, 1.05]);
+  
+  const campusOpacity = useTransform(p, [0.1, 0.4], [0, 1]);
+  
+  // FIXED: Campus background now stays at a 4px blur instead of going to 0
+  const campusBlur = useTransform(p, [0.1, 0.4], [12, 4]); 
+  
+  const campusScale = useTransform(p, [0.1, 0.5], [1.08, 1]); 
 
-  // ISMAGI Campus background fades in and covers the screen
-  const schoolOpacity = useTransform(p, [0.25, 0.6], [0, 1]);
-  const schoolScale = useTransform(p, [0.2, 1], [1.1, 1]);
-  const schoolBlur = useTransform(p, [0.2, 0.5], [15, 0]);
-
-  // Photo and Text split animation
-  const split = useTransform(p, [0.05, 0.3], [0, 1]);
+  const split = useTransform(p, [0.05, 0.35], [0, 1]);
   const photoX = useTransform(split, [0, 1], ["0%", "-38%"]); 
   const textX = useTransform(split, [0, 1], ["0%", "32%"]);
   const photoRotateY = useTransform(split, [0, 1], [0, 12]);
-  const textRotateY = useTransform(split, [0, 1], [0, -8]);
-  const textOpacity = useTransform(split, [0.1, 0.3], [0, 1]);
+  const textOpacity = useTransform(split, [0.1, 0.35], [0, 1]);
 
   const lines = useMemo(() => [
     "In 2024–2025, I completed my Licence in Développement Multimédia 3D & Web.",
@@ -88,126 +79,86 @@ export default function GraduationHero({
     "This experience shaped how I build today: performance-first and detail-oriented.",
   ], []);
 
-  const l0 = useLineReveal(p, 0);
-  const l1 = useLineReveal(p, 1);
-  const l2 = useLineReveal(p, 2);
-  
-  // Progress bar logic
-  const progressW = useTransform(p, [0.1, 0.5], ["0%", "100%"]);
+  const [l0, l1, l2] = [useLineReveal(p, 0), useLineReveal(p, 1), useLineReveal(p, 2)];
+  const progressW = useTransform(p, [0.35, 0.8], ["0%", "100%"]);
 
   return (
-    <section ref={containerRef} className="relative h-[450vh] w-full bg-black antialiased">
-      
-      {/* BACKGROUND LAYERS */}
+    <section ref={containerRef} className="relative h-[220vh] w-full bg-black antialiased">
       <div className="sticky top-0 z-0 h-screen w-full overflow-hidden bg-black">
-        {/* The Campus Background - Configured for Full Coverage */}
-        <motion.div 
-          style={{ 
-            opacity: schoolOpacity, 
-            scale: schoolScale, 
-            filter: useMotionTemplate`blur(${schoolBlur}px)` 
-          }} 
-          className="absolute inset-0 z-10 h-full w-full"
-        >
-          <Image 
-            src={staticBgSrc} 
-            alt="ISMAGI Campus" 
-            fill 
-            className="object-cover object-center" 
-            priority 
-            quality={100} 
-          />
-          {/* Overlays to ensure text and PNG pop */}
-          <div className="absolute inset-0 bg-black/40 mix-blend-multiply" />
-          <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-transparent to-black" />
+        <motion.div style={{ opacity: initialOpacity, scale: initialScale }} className="absolute inset-0">
+          <Image src={initialBgSrc} alt="Intro" fill className="object-cover" priority />
+          <div className="absolute inset-0 bg-black/40" />
         </motion.div>
 
-        {/* The Graduation Video Overlay */}
         <motion.div 
           style={{ 
-            opacity: videoOpacity, 
-            scale: videoScale, 
-            filter: useMotionTemplate`blur(${videoBlur}px)` 
+            opacity: campusOpacity, 
+            filter: useMotionTemplate`blur(${campusBlur}px)`,
+            scale: campusScale
           }} 
-          className="absolute inset-0 z-20"
+          className="absolute inset-0 z-10"
         >
-          <video 
-            className="h-full w-full object-cover" 
-            autoPlay 
-            muted 
-            loop 
-            playsInline 
-            preload="auto"
-          >
-            <source src={videoSrc} type="video/mp4" />
-          </video>
+          <Image src={staticBgSrc} alt="Campus" fill className="object-cover" quality={100} />
+          {/* Subtle overlay to keep the focus on the card */}
+          <div className="absolute inset-0 bg-black/30 bg-gradient-to-b from-black/60 via-transparent to-black" />
         </motion.div>
-        
-        {/* Darkening Vignette Layer */}
-        <div className="absolute inset-0 z-30 bg-gradient-to-t from-black via-transparent to-black/40 pointer-events-none" />
       </div>
 
-      {/* CONTENT LAYER */}
-      <div className="sticky top-0 z-40 flex h-screen items-center justify-center perspective-2000">
+      <div className="sticky top-0 z-30 flex h-screen items-center justify-center perspective-2000">
         <div className="relative w-full max-w-6xl px-6">
           <div className="relative flex flex-col items-center justify-center lg:block">
             
-            {/* GRADUATION PHOTO CARD (Your PNG) */}
             <motion.div
-              style={{ 
-                x: reduceMotion ? 0 : photoX, 
-                rotateY: reduceMotion ? 0 : photoRotateY, 
-                transformPerspective: 1800 
+              style={{
+                x: reduceMotion ? 0 : photoX,
+                rotateY: reduceMotion ? 0 : photoRotateY,
+                transformPerspective: 1800,
               }}
-              className="relative z-50 aspect-[16/11] w-full max-w-[540px] mx-auto lg:mx-0"
+              className="relative z-40 aspect-[16/11] w-full max-w-[540px] mx-auto lg:mx-0"
             >
-              <div className="absolute -inset-[2px] bg-gradient-to-tr from-blue-700 via-blue-400 to-blue-800 rounded-[34px] blur-[2px] opacity-70" />
-              <div className="relative h-full w-full rounded-[32px] overflow-hidden border border-white/10 bg-black/20 backdrop-blur-md">
-                <Image src={src} alt={title} fill className="object-cover object-top" quality={100} />
+              <div className="absolute inset-0 bg-blue-600/20 rounded-[32px] blur-[60px] pointer-events-none" />
+              
+              <div className="relative h-full w-full rounded-[32px] overflow-hidden border border-white/10 bg-white/5 backdrop-blur-3xl shadow-2xl">
+                <Image 
+                  src={src} 
+                  alt="Ahmed Portrait" 
+                  fill 
+                  className="object-contain object-bottom drop-shadow-[0_0_20px_rgba(37,99,235,0.4)]" 
+                  quality={100} 
+                />
+                <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-black/60 to-transparent" />
               </div>
             </motion.div>
 
-            {/* FLOATING TEXT PANEL */}
             <motion.div
-              style={{ 
-                x: reduceMotion ? 0 : textX, 
-                rotateY: reduceMotion ? 0 : textRotateY, 
-                opacity: textOpacity, 
-                transformPerspective: 1800 
-              }}
+              style={{ x: reduceMotion ? 0 : textX, opacity: textOpacity }}
               className="absolute inset-0 hidden items-center justify-center lg:flex pointer-events-none"
             >
-              <div className="pointer-events-auto w-full max-w-[460px] rounded-[45px] border border-blue-500/20 bg-black/80 p-12 shadow-2xl backdrop-blur-3xl">
+              <div className="pointer-events-auto w-full max-w-[460px] rounded-[45px] border border-white/10 bg-black/80 p-12 shadow-2xl backdrop-blur-3xl">
                 <div className="relative space-y-8">
                   <div className="space-y-3">
                     <div className="h-1.5 w-14 bg-blue-600 rounded-full" />
                     <h2 className="text-2xl font-black text-white leading-tight">{subtitle}</h2>
-                    <p className="text-[11px] font-extrabold uppercase tracking-[0.4em] text-blue-400">ISMAGI • Class of {year}</p>
+                    <p className="text-[11px] font-extrabold uppercase tracking-[0.4em] text-blue-400">Class of {year}</p>
                   </div>
 
-                  {/* Staggered Lines Reveal */}
                   <div className="space-y-6">
                     {[l0, l1, l2].map((anim, i) => (
                       <motion.p
                         key={i}
-                        style={{ 
-                          opacity: anim.opacity, 
-                          y: anim.y, 
-                          filter: anim.filter as any 
-                        }}
-                        className="text-[17px] font-semibold leading-relaxed text-white drop-shadow-md"
+                        style={{ opacity: anim.opacity, y: anim.y, filter: anim.filter as any }}
+                        className="text-[17px] font-semibold leading-relaxed text-white/90"
                       >
                         {lines[i]}
                       </motion.p>
                     ))}
                   </div>
 
-                  {/* Scroll Progress Bar */}
                   <div className="pt-4">
-                    <div className="h-[5px] w-full bg-blue-950/40 rounded-full overflow-hidden border border-white/10">
+                    <div className="h-[5px] w-full bg-white/10 rounded-full overflow-hidden">
                       <motion.div
                         style={{ width: progressW }}
-                        className="h-full bg-gradient-to-r from-blue-600 to-sky-400"
+                        className="h-full bg-gradient-to-r from-blue-600 to-sky-400 shadow-[0_0_15px_rgba(59,130,246,0.6)]"
                       />
                     </div>
                   </div>

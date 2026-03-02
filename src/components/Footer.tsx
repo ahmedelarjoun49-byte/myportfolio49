@@ -61,7 +61,7 @@ const Footer = () => {
             <div className="lg:text-right flex flex-col justify-between h-full">
               <div>
                 <p className="text-sm font-black text-zinc-900 dark:text-white uppercase tracking-widest">© 2026 AHMED EL ARJOUN.</p>
-                <p className="text-xs text-zinc-500 dark:text-slate-500 mt-2 font-medium">Built with 💙 in Morocco</p>
+                <p className="text-xs text-zinc-500 dark:text-slate-500 mt-2 font-medium">ae</p>
               </div>
               <div className="mt-12">
                 <span className="text-[10px] font-black text-blue-600 dark:text-blue-500 uppercase tracking-widest block mb-2">Stack</span>
