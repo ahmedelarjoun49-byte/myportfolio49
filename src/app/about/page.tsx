@@ -1,346 +1,164 @@
 "use client";
 
-import Experience from "@/components/Experience";
-import Myplace from "@/components/Myplace";
-import MyStory from "@/components/MyStory_temp";
+import React, { useRef, useState } from "react";
+import { motion, useSpring, useMotionValue, useMotionTemplate, useScroll, useTransform, AnimatePresence } from "framer-motion";
+import { ArrowRight } from "lucide-react";
+import Link from "next/link";
 import Image from "next/image";
-import { motion, type Variants } from "framer-motion";
-import { GraduationCap, Sparkles, BadgeCheck, MapPin } from "lucide-react";
 
-/**
- * ✅ Animations
- */
-const easeOut = [0.22, 1, 0.36, 1] as const;
+const SOCIAL_LINKS = [
+  { id: 'youtube', name: 'YouTube', imgSrc: '/logos/YOUTUBE.png', url: 'https://www.youtube.com/@el4rjoun' },
+  { id: 'instagram', name: 'Instagram', imgSrc: '/logos/instagram.png', url: 'https://www.instagram.com/el4rjoun/' },
+  { id: 'kick', name: 'Kick', imgSrc: '/logos/kick.jpeg', url: 'https://kick.com/el4rjounx' },
+];
 
-const page: Variants = {
-  hidden: { opacity: 0 },
-  show: { opacity: 1, transition: { duration: 0.45, ease: easeOut } },
-};
+export default function AboutPage() {
+  const [isDarkMode, setIsDarkMode] = useState(true);
+  const [isFlashActive, setIsFlashActive] = useState(false);
+  
+  const mouseX = useSpring(useMotionValue(0), { stiffness: 500, damping: 50 });
+  const mouseY = useSpring(useMotionValue(0), { stiffness: 500, damping: 50 });
 
-const stagger: Variants = {
-  hidden: {},
-  show: { transition: { staggerChildren: 0.08, delayChildren: 0.12 } },
-};
+  const mainRef = useRef(null);
+  const { scrollYProgress } = useScroll({ target: mainRef, offset: ["start start", "end end"] });
 
-const rise: Variants = {
-  hidden: { opacity: 0, y: 18, filter: "blur(8px)" },
-  show: { opacity: 1, y: 0, filter: "blur(0px)", transition: { duration: 0.65, ease: easeOut } },
-};
+  const smoothY = useSpring(useTransform(scrollYProgress, [0, 1], ["0%", "15%"]), { stiffness: 100, damping: 30 });
+  const rotateX = useTransform(mouseY, [0, 1000], [2, -2]);
+  const rotateY = useTransform(mouseX, [0, 1000], [-2, 2]);
 
-const card: Variants = {
-  hidden: { opacity: 0, y: 14, scale: 0.985, filter: "blur(10px)" },
-  show: { opacity: 1, y: 0, scale: 1, filter: "blur(0px)", transition: { duration: 0.6, ease: easeOut } },
-};
+  const handleMouseMove = (e: React.MouseEvent) => {
+    mouseX.set(e.clientX);
+    mouseY.set(e.clientY);
+  };
 
-const floaty: Variants = {
-  hidden: { opacity: 0, scale: 0.95 },
-  show: { opacity: 1, scale: 1, transition: { duration: 0.6, ease: easeOut } },
-};
-
-function GlowOrb({
-  className,
-  delay = 0,
-}: {
-  className: string;
-  delay?: number;
-}) {
-  return (
-    <motion.div
-      aria-hidden
-      className={className}
-      initial={{ opacity: 0, scale: 0.9 }}
-      animate={{
-        opacity: 1,
-        scale: 1,
-        y: [0, -12, 0],
-        x: [0, 10, 0],
-      }}
-      transition={{
-        duration: 10,
-        delay,
-        repeat: Infinity,
-        repeatType: "mirror",
-        ease: "easeInOut",
-      }}
-    />
-  );
-}
-
-export default function About() {
-  /**
-   * ✅ Put your university logo here
-   * - Add the file into /public, for example: /public/ismagi.png
-   * - Then set src to "/ismagi.png"
-   */
-  const UNIVERSITY_LOGO_SRC = "/ismagi.png"; // <-- change this to your logo path
-
-  const cards = [
-    {
-      title: "Clean Frontend Craft",
-      text: "I build modern interfaces that feel fast, smooth, and premium — with attention to small details that users notice.",
-      accent: "from-purple-500/15 via-purple-400/10 to-transparent",
-      ring: "ring-purple-500/15",
-    },
-    {
-      title: "Goal-Driven Delivery",
-      text: "I focus on clear outcomes: performance, accessibility, and a UI that supports the project goals from day one.",
-      accent: "from-blue-500/15 via-blue-400/10 to-transparent",
-      ring: "ring-blue-500/15",
-    },
-    {
-      title: "User Experience First",
-      text: "Every animation and layout choice is made to improve clarity, confidence, and ease of use for real people.",
-      accent: "from-emerald-500/15 via-emerald-400/10 to-transparent",
-      ring: "ring-emerald-500/15",
-    },
-    {
-      title: "Quality & Consistency",
-      text: "I keep code and design consistent, scalable, and maintainable — so the product stays strong over time.",
-      accent: "from-orange-500/15 via-orange-400/10 to-transparent",
-      ring: "ring-orange-500/15",
-    },
-  ] as const;
+  const toggleTheme = () => {
+    setIsFlashActive(true);
+    setTimeout(() => setIsDarkMode(!isDarkMode), 150); 
+    setTimeout(() => setIsFlashActive(false), 800);
+  };
 
   return (
-    <motion.main
-      variants={page}
-      initial="hidden"
-      animate="show"
-      className="relative mx-auto w-full max-w-7xl px-4 md:px-8 lg:px-12"
+    <div 
+      ref={mainRef}
+      className={`relative min-h-screen transition-colors duration-700 selection:bg-blue-500/30 overflow-hidden font-sans ${isDarkMode ? 'bg-black text-white' : 'bg-white text-slate-900'}`}
+      onMouseMove={handleMouseMove}
     >
-      {/* =========================
-          HERO
-      ========================== */}
-      <section className="relative overflow-hidden pt-14 pb-16 md:pt-16 md:pb-20">
-        {/* Background gradient wash */}
-        <div aria-hidden className="absolute inset-0 -z-10">
-          <div className="absolute -top-40 left-1/2 h-80 w-[46rem] -translate-x-1/2 rounded-full bg-gradient-to-r from-purple-200/60 via-purple-100/20 to-transparent blur-3xl dark:from-purple-500/20 dark:via-purple-400/10 dark:opacity-80" />
-          <div className="absolute -bottom-48 right-[-12rem] h-80 w-[50rem] rounded-full bg-gradient-to-l from-purple-200/45 via-transparent to-transparent blur-3xl dark:from-purple-500/15 dark:opacity-70" />
-        </div>
+      {/* 1. FLASHBANG OVERLAY */}
+      <AnimatePresence>
+        {isFlashActive && (
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.15 }} className="fixed inset-0 z-[100] bg-white pointer-events-none" />
+        )}
+      </AnimatePresence>
 
-        {/* Animated orbs */}
-        <GlowOrb className="absolute top-10 right-10 w-32 h-32 bg-purple-200/30 dark:bg-purple-500/10 rounded-full blur-xl -z-10" />
-        <GlowOrb
-          delay={0.6}
-          className="absolute bottom-20 left-10 w-24 h-24 bg-purple-300/30 dark:bg-purple-400/10 rounded-full blur-xl -z-10"
-        />
-        <GlowOrb
-          delay={1.2}
-          className="absolute top-1/2 left-1/4 w-16 h-16 bg-purple-400/20 dark:bg-purple-300/10 rounded-full blur-lg -z-10"
-        />
-
-        {/* Subtle grid texture */}
-        <div
-          aria-hidden
-          className="absolute inset-0 -z-10 opacity-[0.35] dark:opacity-[0.22]"
-          style={{
-            backgroundImage:
-              "radial-gradient(circle at 1px 1px, rgba(124,58,237,0.18) 1px, transparent 0)",
-            backgroundSize: "22px 22px",
+      {/* 2. FC 26 LOGO - APPEARS FIRST (THE FOUNDATION) */}
+      <div className="fixed inset-0 z-0 flex items-center justify-center pointer-events-none select-none">
+        <motion.div 
+          initial={{ opacity: 0, scale: 0.8, filter: "blur(15px)" }}
+          animate={{ opacity: isDarkMode ? 0.2 : 0.12, scale: 1, filter: "blur(0px)" }}
+          transition={{ 
+            duration: 1.5, 
+            ease: "easeOut",
+            delay: 0.1 
           }}
-        />
+          className="relative w-[80vw] h-[80vh] ml-[5%]"
+        >
+          <Image 
+            src="/photos11/fc26.png" 
+            alt="FC26" 
+            fill 
+            className="object-contain grayscale contrast-125" 
+            priority 
+          />
+        </motion.div>
+      </div>
 
-        <motion.div variants={stagger} initial="hidden" animate="show">
-          {/* Identity row */}
-          <motion.div
-            variants={rise}
-            className="mx-auto mb-10 flex w-full max-w-5xl flex-col items-center justify-between gap-4 rounded-3xl border border-gray-200/80 bg-white/70 p-4 backdrop-blur dark:border-white/10 dark:bg-white/5 md:flex-row md:px-6"
-          >
-            {/* Left: logo + name */}
-            <div className="flex items-center gap-4">
-              <div className="relative h-12 w-12 overflow-hidden rounded-2xl border border-gray-200 bg-white dark:border-white/10 dark:bg-white/10">
-                {/* University logo slot */}
-                <Image
-                  src={UNIVERSITY_LOGO_SRC}
-                  alt="University Logo"
-                  fill
-                  className="object-contain p-2"
-                  priority
-                />
-              </div>
+      {/* 3. CS2 CHARACTER - APPEARS SECOND (THE TACTICAL ENTRANCE) */}
+      <div className="fixed inset-0 z-20 pointer-events-none">
+        <motion.div
+          initial={{ opacity: 0, x: 800 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ 
+            type: "spring", 
+            stiffness: 45, 
+            damping: 14, 
+            delay: 1.0 // Triggered after the FC26 logo is established
+          }}
+          className="absolute right-[-2%] bottom-[-5%] w-[48vw] h-[85vh] flex items-end justify-end"
+          style={{ y: smoothY, rotateX, rotateY, perspective: 1200 }}
+        >
+          <Image 
+            src="/photos11/csgo2.png" 
+            alt="CS2 Character" 
+            fill 
+            className="object-contain drop-shadow-[0_0_80px_rgba(37,99,235,0.4)] scale-x-[-1]" 
+            priority 
+          />
+        </motion.div>
+      </div>
 
-              <div className="leading-tight">
-                <p className="text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400">
-                  Portfolio
-                </p>
-                <h2 className="text-lg font-extrabold text-gray-900 dark:text-gray-100">
-                  Ahmed El Arjoun
-                </h2>
-              </div>
-            </div>
+      {/* 4. GRENADE SWITCH */}
+      <div className="fixed top-12 right-12 z-[60] flex flex-col items-center gap-4">
+        <motion.button 
+          onClick={toggleTheme}
+          initial={{ scale: 0, rotate: -45 }}
+          animate={{ scale: 1, rotate: 0 }}
+          transition={{ delay: 1.8 }}
+          whileHover={{ scale: 1.1, rotate: 15 }}
+          className="relative w-28 h-28 group cursor-pointer"
+        >
+          <div className="absolute inset-0 bg-blue-600/20 blur-[40px] rounded-full group-hover:bg-blue-600/50 transition-all" />
+          <Image src="/photos11/flashlight.png" alt="Flash" fill className="object-contain drop-shadow-2xl" />
+        </motion.button>
+      </div>
 
-            {/* Right: chips */}
-            <div className="flex flex-wrap items-center justify-center gap-2 md:justify-end">
-              <span className="inline-flex items-center gap-2 rounded-full border border-gray-200/80 bg-white/70 px-3 py-1 text-xs text-gray-800 backdrop-blur dark:border-white/10 dark:bg-white/5 dark:text-gray-200">
-                <GraduationCap className="h-4 w-4 text-purple-600 dark:text-purple-300" />
-                ISMAGI Student
-              </span>
-
-              <span className="inline-flex items-center gap-2 rounded-full border border-gray-200/80 bg-white/70 px-3 py-1 text-xs text-gray-800 backdrop-blur dark:border-white/10 dark:bg-white/5 dark:text-gray-200">
-                <BadgeCheck className="h-4 w-4 text-purple-600 dark:text-purple-300" />
-                Frontend Developer
-              </span>
-
-              {/* Optional location (remove if you want) */}
-              <span className="inline-flex items-center gap-2 rounded-full border border-gray-200/80 bg-white/70 px-3 py-1 text-xs text-gray-800 backdrop-blur dark:border-white/10 dark:bg-white/5 dark:text-gray-200">
-                <MapPin className="h-4 w-4 text-purple-600 dark:text-purple-300" />
-                Rabat, Morocco
-              </span>
-            </div>
-          </motion.div>
-
-          {/* Main headline */}
-          <div className="text-center">
-            <motion.div variants={rise} className="inline-block">
-              <h1 className="text-4xl md:text-6xl lg:text-7xl font-extrabold text-gray-900 dark:text-gray-100">
-                About me
-                <span className="text-purple-600 dark:text-purple-300">.</span>
-              </h1>
-
-              {/* glow underline */}
-              <motion.div
-                variants={floaty}
-                className="mx-auto mt-4 h-[6px] w-28 origin-left rounded-full bg-purple-600/30 dark:bg-purple-300/20 blur-[1px]"
-              />
-            </motion.div>
-
-            <motion.p
-              variants={rise}
-              className="mt-7 text-base sm:text-lg md:text-xl lg:text-2xl text-gray-700 dark:text-gray-200 leading-relaxed max-w-4xl mx-auto border-l-4 md:border-l-8 border-purple-600 dark:border-purple-300 pl-4 md:pl-8"
-            >
-              Developing beautiful and functional websites is what I love doing,
-              and{" "}
-              <span className="text-purple-600 dark:text-purple-300 font-semibold">
-                {`that's`} why I give my all
-              </span>{" "}
-              in every new challenge.
-            </motion.p>
-
-            {/* Tech badges */}
-            <motion.div
-              variants={rise}
-              className="mt-7 flex flex-wrap items-center justify-center gap-2"
-            >
-              {["React", "Next.js", "TypeScript", "Tailwind", "Framer Motion"].map(
-                (t) => (
-                  <span
-                    key={t}
-                    className="rounded-full border border-gray-200/80 dark:border-white/10 bg-white/70 dark:bg-white/5 px-3 py-1 text-xs sm:text-sm text-gray-800 dark:text-gray-200 backdrop-blur"
-                  >
-                    {t}
-                  </span>
-                )
-              )}
-            </motion.div>
-
-            {/* CTA row */}
-            <motion.div
-              variants={rise}
-              className="mt-9 flex flex-col sm:flex-row items-center justify-center gap-3"
-            >
-              <a
-                href="#story"
-                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-2xl bg-purple-600 px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-purple-600/20 hover:shadow-xl hover:shadow-purple-600/25 transition"
-              >
-                <Sparkles className="h-4 w-4" />
-                Explore my story
-              </a>
-
-              <a
-                href="#experience"
-                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-2xl border border-gray-200/80 bg-white/70 px-5 py-3 text-sm font-semibold text-gray-900 backdrop-blur hover:bg-white transition dark:border-white/10 dark:bg-white/5 dark:text-gray-100 dark:hover:bg-white/10"
-              >
-                See experience
-              </a>
-            </motion.div>
+      {/* 5. MAIN CONTENT */}
+      <main className="relative z-30 max-w-7xl mx-auto px-10 pt-32 pb-20">
+        <motion.div 
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 1.4 }}
+          className="w-full lg:w-[58%] flex flex-col gap-12"
+        >
+          <div>
+            <h3 className="text-xl font-black text-blue-600 uppercase italic mb-4 tracking-tighter">@EL4RJOUN</h3>
+            <h1 className="text-8xl md:text-[10rem] font-black tracking-tighter uppercase leading-[0.75] mb-6">
+              ABOUT <br/><span className="text-blue-600 italic font-black">ME.</span>
+            </h1>
           </div>
 
-          {/* Cards */}
-          <motion.div
-            variants={stagger}
-            className="mt-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 lg:gap-6"
-          >
-            {cards.map((c) => (
-              <motion.div
-                key={c.title}
-                variants={card}
-                whileHover={{ y: -7, transition: { duration: 0.2 } }}
-                whileTap={{ scale: 0.98 }}
-                className={[
-                  "group relative overflow-hidden rounded-2xl border border-gray-200 dark:border-white/10",
-                  "bg-white/90 dark:bg-white/5 backdrop-blur shadow-lg hover:shadow-xl transition-all duration-300 p-6",
-                  "ring-1",
-                  c.ring,
-                ].join(" ")}
-              >
-                {/* Accent gradient */}
-                <div
-                  aria-hidden
-                  className={`absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-gradient-to-br ${c.accent}`}
-                />
+          <div className={`p-10 rounded-[2.5rem] border transition-all duration-700 ${isDarkMode ? 'bg-zinc-900/60 border-white/5 backdrop-blur-xl shadow-2xl shadow-blue-900/10' : 'bg-white border-slate-200 shadow-2xl'}`}>
+            <p className="text-4xl font-light mb-6 leading-tight">
+              I love <span className="text-blue-600 font-extrabold italic">Coding</span> and I am a <span className="text-blue-600 font-extrabold italic">Passionate Learner</span>.
+            </p>
+            <p className="text-xl opacity-60 leading-relaxed">
+              Beyond the code, gaming is my ultimate hobby. I thrive on tactical precision, strategy, and clean execution in everything I build.
+            </p>
+          </div>
 
-                <div className="relative">
-                  <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100">
-                    {c.title}
-                  </h3>
-                  <p className="mt-3 text-gray-700 dark:text-gray-300 leading-relaxed text-sm md:text-base">
-                    {c.text}
-                  </p>
+          {/* SOCIALS */}
+          <div className="grid grid-cols-3 gap-6">
+            {SOCIAL_LINKS.map((link) => (
+              <a key={link.id} href={link.url} target="_blank" className={`group flex flex-col items-center justify-center p-8 rounded-[2rem] border transition-all h-44 ${isDarkMode ? 'bg-zinc-900/30 border-white/5 hover:border-blue-500/50' : 'bg-white border-slate-200 hover:shadow-xl'}`}>
+                <div className="relative w-16 h-16 mb-4 transform group-hover:scale-125 group-hover:-translate-y-2 transition-all duration-500">
+                  <Image src={link.imgSrc} alt={link.name} fill className="object-contain" />
                 </div>
-              </motion.div>
+                <span className="text-[10px] font-black uppercase tracking-[0.3em] opacity-40 group-hover:opacity-100 transition-opacity">{link.name}</span>
+              </a>
             ))}
-          </motion.div>
+          </div>
 
-          {/* Mission */}
-          <motion.div
-            variants={rise}
-            className="mt-12 rounded-2xl border border-purple-200 dark:border-purple-400/20 bg-gradient-to-r from-purple-50 to-gray-50 dark:from-white/5 dark:to-white/0 p-8 md:p-12 relative overflow-hidden"
-          >
-            <motion.div
-              aria-hidden
-              className="absolute -inset-x-20 -top-20 h-40 bg-purple-300/20 dark:bg-purple-400/10 blur-2xl"
-              animate={{ x: [-40, 40, -40] }}
-              transition={{
-                duration: 10,
-                repeat: Infinity,
-                repeatType: "mirror",
-                ease: "easeInOut",
-              }}
-            />
-
-            <div className="relative text-center">
-              <h2 className="text-2xl md:text-3xl font-extrabold text-gray-900 dark:text-gray-100 mb-5">
-                My Mission
-              </h2>
-              <p className="text-gray-700 dark:text-gray-300 text-base md:text-lg leading-relaxed max-w-4xl mx-auto">
-                To create{" "}
-                <span className="text-purple-600 dark:text-purple-300 font-semibold">
-                  innovative, accessible, and impactful digital solutions
-                </span>{" "}
-                that not only meet client requirements but exceed expectations.
-                I believe in the power of technology to transform businesses and
-                enhance user experiences.
-              </p>
-            </div>
-          </motion.div>
+          <Link href="/" className="group flex items-center gap-4 text-xs font-black uppercase tracking-[0.5em] text-blue-600 hover:text-blue-400 transition-all pt-10">
+            <ArrowRight size={24} className="rotate-180 group-hover:-translate-x-4 transition-transform" /> 
+            Back to Dashboard
+          </Link>
         </motion.div>
-      </section>
+      </main>
 
-      {/* =========================
-          SECTIONS
-          - Add IDs so CTA buttons work
-      ========================== */}
-      <section id="place">
-        <Myplace />
-      </section>
-
-      <section id="story">
-        <MyStory />
-      </section>
-
-      <section id="experience">
-        <Experience />
-      </section>
-    </motion.main>
+      {/* INTERACTIVE GLOW */}
+      <motion.div 
+        className="pointer-events-none fixed inset-0 z-50 opacity-25" 
+        style={{ background: useMotionTemplate`radial-gradient(1000px circle at ${mouseX}px ${mouseY}px, rgba(37,99,235,0.25), transparent 80%)` }} 
+      />
+    </div>
   );
 }

@@ -4,8 +4,8 @@ import { useEffect, useState } from "react";
 import {
   motion,
   AnimatePresence,
-  useScroll,
   useSpring,
+  useMotionValue,
   useMotionTemplate,
   type Variants,
 } from "framer-motion";
@@ -43,13 +43,14 @@ const rise: Variants = {
 
 export default function HomeClient() {
   const [loading, setLoading] = useState(true);
-  const mouseX = useSpring(0, { stiffness: 500, damping: 50 });
-  const mouseY = useSpring(0, { stiffness: 500, damping: 50 });
+  
+  // Smooth mouse movement for the radial glow
+  const mouseX = useSpring(useMotionValue(0), { stiffness: 500, damping: 50 });
+  const mouseY = useSpring(useMotionValue(0), { stiffness: 500, damping: 50 });
 
-  function handleMouseMove({ clientX, clientY, currentTarget }: React.MouseEvent) {
-    const { left, top } = currentTarget.getBoundingClientRect();
-    mouseX.set(clientX - left);
-    mouseY.set(clientY - top);
+  function handleMouseMove({ clientX, clientY }: React.MouseEvent) {
+    mouseX.set(clientX);
+    mouseY.set(clientY);
   }
 
   useEffect(() => {
@@ -75,6 +76,16 @@ export default function HomeClient() {
           onMouseMove={handleMouseMove}
           className="relative min-h-screen flex items-center justify-center overflow-hidden"
         >
+          {/* MOUSE GLOW EFFECT */}
+          <motion.div
+            className="pointer-events-none fixed inset-0 z-30 opacity-60"
+            style={{
+              background: useMotionTemplate`
+                radial-gradient(650px circle at ${mouseX}px ${mouseY}px, rgba(37,99,235,0.15), transparent 80%)
+              `,
+            }}
+          />
+
           {/* BACKGROUND */}
           <div className="absolute inset-0 z-0">
             <video
@@ -83,14 +94,6 @@ export default function HomeClient() {
               autoPlay muted loop playsInline
             />
             <div className="absolute inset-0 bg-black/60 backdrop-blur-[2px]" />
-            <motion.div
-              className="pointer-events-none absolute inset-0 z-10 opacity-50"
-              style={{
-                background: useMotionTemplate`
-                  radial-gradient(600px circle at ${mouseX}px ${mouseY}px, rgba(37,99,235,0.15), transparent 80%)
-                `,
-              }}
-            />
           </div>
 
           <main className="relative z-20 container mx-auto px-6 md:px-12 max-w-7xl">
@@ -108,13 +111,13 @@ export default function HomeClient() {
                   </h2>
 
                   <div className="relative">
-                    <h1 className="text-6xl md:text-7xl lg:text-8xl font-black leading-none tracking-tighter text-white">
+                    <h1 className="text-6xl md:text-7xl lg:text-8xl font-black leading-tight tracking-tighter text-white">
                       <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-blue-600 drop-shadow-[0_0_20px_rgba(37,99,235,0.4)]">
                         Web
                       </span>
                       
-                      {/* STABLE WRAPPER: Prevents layout shifting and "b" clipping */}
-                      <div className="min-h-[1.1em] overflow-visible py-2">
+                      {/* FIXED WRAPPER: Added pb-2 and leading-snug to stop character clipping */}
+                      <div className="min-h-[1.1em] overflow-visible pb-2 pt-1 leading-snug">
                         <Typewriter
                           words={["Junior Dev", "Multimedia Developer"]}
                           loop={0}
@@ -136,8 +139,9 @@ export default function HomeClient() {
                   </div>
                 </motion.div>
 
-                <motion.p variants={rise} className="text-base md:text-lg text-white/50 max-w-md mx-auto lg:mx-0">
-                  I build modern, responsive, user-centric web experiences — focused on clean UI/UX and performance.
+                {/* REWRITTEN PROFESSIONAL DESCRIPTION */}
+                <motion.p variants={rise} className="text-base md:text-lg text-white/50 max-w-xl mx-auto lg:mx-0 leading-relaxed">
+                  A versatile <span className="text-white/80">Full-Stack Junior Developer</span> and <span className="text-white/80">IoT student</span>, blending technical engineering with creative <span className="text-white/80">Multimedia 3D</span> expertise to build the next generation of interactive digital experiences.
                 </motion.p>
 
                 <motion.div variants={rise} className="flex flex-wrap gap-4 justify-center lg:justify-start">
@@ -163,7 +167,6 @@ export default function HomeClient() {
                 variants={rise}
                 className="relative w-full lg:w-[40%] flex justify-center lg:justify-end items-end"
               >
-                {/* Glow behind photo */}
                 <div className="absolute bottom-1/4 right-0 w-80 h-80 bg-blue-600/20 rounded-full blur-[100px] pointer-events-none" />
                 
                 <div className="relative z-20">
@@ -172,7 +175,6 @@ export default function HomeClient() {
                     alt="Ahmed Portrait"
                     className="w-auto h-[50vh] lg:h-[80vh] object-contain drop-shadow-[0_0_40px_rgba(37,99,235,0.3)]"
                   />
-                  {/* Bottom fade to keep picture from feeling cut off */}
                   <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-black via-black/20 to-transparent" />
                 </div>
               </motion.div>

@@ -1,159 +1,149 @@
 "use client";
 
+import React from "react";
+import { motion, useSpring, useMotionValue, useMotionTemplate } from "framer-motion";
+import { Code2, Cpu, Globe, Zap, ArrowRight } from "lucide-react";
 import Link from "next/link";
-import { ArrowUpRight, Heart } from "lucide-react";
-import {
-  motion,
-  useReducedMotion,
-  useScroll,
-  useSpring,
-  useTransform,
-  useMotionTemplate,
-} from "framer-motion";
-import { useRef } from "react";
 
-export default function HomePage() {
-  const prefersReducedMotion = useReducedMotion();
-  const sectionRef = useRef<HTMLElement | null>(null);
+export default function AboutPage() {
+  // Mouse Glow Logic
+  const mouseX = useSpring(useMotionValue(0), { stiffness: 500, damping: 50 });
+  const mouseY = useSpring(useMotionValue(0), { stiffness: 500, damping: 50 });
 
-  // Track scroll only in this section
-  const { scrollYProgress } = useScroll({
-    target: sectionRef,
-    offset: ["start end", "end start"],
-  });
-
-  // Smooth progress
-  const p = useSpring(scrollYProgress, {
-    stiffness: 120,
-    damping: 22,
-    mass: 0.6,
-  });
-
-  // Parallax / depth
-  const y = useTransform(p, [0, 1], prefersReducedMotion ? [0, 0] : [18, -18]);
-  const scale = useTransform(
-    p,
-    [0, 0.5, 1],
-    prefersReducedMotion ? [1, 1, 1] : [0.985, 1.01, 0.99]
-  );
-
-  // Blur (number) + motion template (no .to usage)
-  const blurPx = useTransform(p, [0, 0.35], prefersReducedMotion ? [0, 0] : [10, 0]);
-  const filter = useMotionTemplate`blur(${blurPx}px)`;
-
-  // Fade in slightly
-  const opacity = useTransform(p, [0, 0.25], [0.6, 1]);
+  const handleMouseMove = (e: React.MouseEvent) => {
+    mouseX.set(e.clientX);
+    mouseY.set(e.clientY);
+  };
 
   return (
-    <main className="relative w-full overflow-hidden">
-      {/* Background */}
-      <div className="pointer-events-none absolute inset-0 -z-10">
-        {/* Light */}
-        <div className="absolute -top-24 left-1/2 h-64 w-[720px] -translate-x-1/2 rounded-full bg-purple-500/10 blur-3xl dark:hidden" />
-        <div className="absolute top-32 left-1/3 h-72 w-[760px] -translate-x-1/2 rounded-full bg-emerald-500/10 blur-3xl dark:hidden" />
+    <div 
+      className="relative min-h-screen bg-black text-white selection:bg-blue-500/30 overflow-hidden font-sans"
+      onMouseMove={handleMouseMove}
+    >
+      {/* 1. MOUSE GLOW BACKGROUND */}
+      <motion.div
+        className="pointer-events-none fixed inset-0 z-10 opacity-40"
+        style={{
+          background: useMotionTemplate`
+            radial-gradient(600px circle at ${mouseX}px ${mouseY}px, rgba(37,99,235,0.15), transparent 80%)
+          `,
+        }}
+      />
 
-        {/* Dark */}
-        <div className="hidden dark:block absolute -top-28 left-1/2 h-72 w-[760px] -translate-x-1/2 rounded-full bg-emerald-400/10 blur-3xl" />
-        <div className="hidden dark:block absolute top-40 left-1/3 h-72 w-[820px] -translate-x-1/2 rounded-full bg-purple-400/10 blur-3xl" />
-
-        {/* Bottom fade */}
-        <div className="absolute inset-x-0 bottom-0 h-44 bg-gradient-to-t from-black/10 to-transparent dark:from-black/50" />
+      {/* 2. BACKGROUND VIDEO */}
+      <div className="absolute inset-0 z-0 opacity-30">
+        <video
+          className="h-full w-full object-cover"
+          src="/stars.mp4"
+          autoPlay 
+          muted 
+          loop 
+          playsInline
+        />
+        <div className="absolute inset-0 bg-black/60" />
       </div>
 
-      {/* HERO / CTA SECTION */}
-      <section
-        ref={sectionRef}
-        className="mx-auto max-w-6xl px-4 md:px-8 lg:px-10 pt-24 md:pt-28 pb-28 md:pb-40"
-      >
-        <motion.div
-          style={{
-            y,
-            scale,
-            opacity,
-            filter: prefersReducedMotion ? "none" : (filter as unknown as string),
-          }}
-          initial={prefersReducedMotion ? false : { opacity: 0, y: 16, scale: 0.985 }}
-          whileInView={prefersReducedMotion ? undefined : { opacity: 1, y: 0, scale: 1 }}
-          viewport={{ once: true, amount: 0.3 }}
-          transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-          className="relative"
+      {/* 3. MAIN CONTENT (CLEAN SUMMARY ONLY) */}
+      <main className="relative z-20 max-w-4xl mx-auto px-6 pt-32 pb-20">
+        <motion.div 
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ staggerChildren: 0.1 }}
         >
-          {/* Card glow */}
-          <div className="pointer-events-none absolute -inset-1 -z-10 rounded-3xl bg-gradient-to-r from-purple-500/15 via-emerald-500/15 to-purple-500/15 blur-2xl dark:from-purple-400/10 dark:via-emerald-400/10 dark:to-purple-400/10" />
+          
+          {/* Headline */}
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+            className="mb-10"
+          >
+            <h1 className="text-6xl md:text-8xl font-black tracking-tighter mb-4 leading-[1.1]">
+              MY <span className="text-blue-500">SUMMARY.</span>
+            </h1>
+            <div className="h-1.5 w-24 bg-blue-600 rounded-full" />
+          </motion.div>
 
-          <div className="rounded-3xl border border-black/10 bg-white/70 backdrop-blur-xl px-6 py-12 md:px-10 md:py-14 text-center shadow-sm dark:border-white/10 dark:bg-zinc-950/60">
-            {/* Icon */}
-            <motion.div
-              initial={prefersReducedMotion ? false : { opacity: 0, scale: 0.9 }}
-              whileInView={prefersReducedMotion ? undefined : { opacity: 1, scale: 1 }}
-              viewport={{ once: true, amount: 0.6 }}
-              transition={{ delay: 0.1, duration: 0.5 }}
-              className="mb-4 flex justify-center"
+          {/* Professional Summary Text */}
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.1 }}
+            className="space-y-6 text-lg md:text-xl text-white/70 leading-relaxed"
+          >
+            <p>
+              I am <span className="text-white font-semibold underline underline-offset-4 decoration-blue-500">Ahmed El Arjoun</span>, 
+              a Full-Stack Junior Developer and IoT Student based in Rabat, Morocco. I specialize in building 
+              highly interactive web applications and exploring the intersection of software and hardware.
+            </p>
+            <p>
+              My approach focuses on clean code, performance, and user-centric design. Whether it is creating 
+              responsive interfaces with <span className="text-white">Next.js</span> or integrating smart systems 
+              in the <span className="text-white">IoT</span> space, I strive to deliver impactful digital experiences.
+            </p>
+          </motion.div>
+
+          {/* Core Pillars */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-16">
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+              className="p-8 rounded-3xl border border-white/10 bg-white/5 backdrop-blur-md group hover:border-blue-500/50 transition-colors"
             >
-              <span className="inline-flex h-12 w-12 items-center justify-center rounded-2xl border border-black/10 bg-white/60 shadow-sm dark:border-white/10 dark:bg-zinc-950/50">
-                <Heart className="h-6 w-6 text-purple-600 dark:text-purple-400" />
-              </span>
+              <Code2 className="text-blue-500 mb-4 group-hover:scale-110 transition-transform" size={32} />
+              <h3 className="text-xl font-bold mb-2 text-white">Full-Stack Development</h3>
+              <p className="text-sm text-white/50 leading-relaxed text-left">
+                Expertise in React, TypeScript, and modern styling frameworks to create scalable, professional web platforms.
+              </p>
             </motion.div>
 
-            {/* Title */}
-            <motion.h1
-              initial={prefersReducedMotion ? false : { opacity: 0, y: 10 }}
-              whileInView={prefersReducedMotion ? undefined : { opacity: 1, y: 0 }}
-              viewport={{ once: true, amount: 0.6 }}
-              transition={{ delay: 0.15, duration: 0.55 }}
-              className="text-3xl md:text-4xl font-bold text-zinc-950 dark:text-white"
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.3 }}
+              className="p-8 rounded-3xl border border-white/10 bg-white/5 backdrop-blur-md group hover:border-blue-500/50 transition-colors"
             >
-              Passion for Building
-            </motion.h1>
-
-            {/* Subtitle */}
-            <motion.p
-              initial={prefersReducedMotion ? false : { opacity: 0, y: 10 }}
-              whileInView={prefersReducedMotion ? undefined : { opacity: 1, y: 0 }}
-              viewport={{ once: true, amount: 0.6 }}
-              transition={{ delay: 0.22, duration: 0.55 }}
-              className="mx-auto mt-4 max-w-2xl text-sm md:text-base text-zinc-600 dark:text-zinc-300"
-            >
-              Every project is a chance to learn and create something polished.
-              I focus on clean UI, smooth interactions, and modern performance.
-            </motion.p>
-
-            {/* Buttons */}
-            <motion.div
-              initial={prefersReducedMotion ? false : { opacity: 0, y: 10 }}
-              whileInView={prefersReducedMotion ? undefined : { opacity: 1, y: 0 }}
-              viewport={{ once: true, amount: 0.6 }}
-              transition={{ delay: 0.28, duration: 0.55 }}
-              className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3"
-            >
-              <Link
-                href="/contact"
-                className="group inline-flex w-full sm:w-auto items-center justify-center gap-2 rounded-xl
-                  bg-zinc-950 px-6 py-3 text-sm font-semibold text-white
-                  shadow-sm transition-all
-                  hover:-translate-y-0.5 hover:shadow-md active:translate-y-0
-                  dark:bg-white dark:text-zinc-950"
-              >
-                Ready to work together?
-                <ArrowUpRight className="h-4 w-4 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
-              </Link>
-
-              <Link
-                href="/projects"
-                className="inline-flex w-full sm:w-auto items-center justify-center rounded-xl
-                  border border-black/15 bg-white/60 px-6 py-3 text-sm font-semibold text-zinc-950
-                  transition-all hover:-translate-y-0.5 hover:bg-zinc-950 hover:text-white hover:shadow-md active:translate-y-0
-                  dark:border-white/15 dark:bg-zinc-950/50 dark:text-white dark:hover:bg-white dark:hover:text-zinc-950"
-              >
-                View Projects
-              </Link>
+              <Cpu className="text-blue-500 mb-4 group-hover:scale-110 transition-transform" size={32} />
+              <h3 className="text-xl font-bold mb-2 text-white">IoT Engineering</h3>
+              <p className="text-sm text-white/50 leading-relaxed text-left">
+                Applying engineering principles to the Internet of Things, connecting the physical world to digital ecosystems.
+              </p>
             </motion.div>
           </div>
-        </motion.div>
-      </section>
 
-      {/* Transition into footer */}
-      <div className="pointer-events-none h-16 w-full bg-gradient-to-b from-transparent to-black/10 dark:to-black/40" />
-    </main>
+          {/* Minimal Footer Info */}
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.8, delay: 0.4 }}
+            className="mt-20 pt-10 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-6"
+          >
+            <div className="flex flex-wrap justify-center gap-8">
+              <div className="flex items-center gap-2">
+                <Globe size={18} className="text-blue-400" />
+                <span className="text-xs font-bold tracking-[0.2em] uppercase opacity-60 text-left">Rabat, Morocco</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Zap size={18} className="text-blue-400" />
+                <span className="text-xs font-bold tracking-[0.2em] uppercase opacity-60 text-left">Ready for Work</span>
+              </div>
+            </div>
+
+            <Link 
+              href="/" 
+              className="flex items-center gap-2 text-sm font-bold uppercase tracking-widest text-blue-500 hover:text-blue-400 transition-colors"
+            >
+              Back Home <ArrowRight size={16} />
+            </Link>
+          </motion.div>
+        </motion.div>
+      </main>
+
+      {/* IMPORTANT: 
+        The "Experience" and "Stages" components are GONE.
+        Nothing else is rendered below this main tag. 
+      */}
+    </div>
   );
 }
