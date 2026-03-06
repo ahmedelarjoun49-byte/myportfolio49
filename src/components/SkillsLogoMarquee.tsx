@@ -4,22 +4,21 @@ import Image from "next/image";
 import { motion, useSpring, useTransform } from "framer-motion";
 import { useMemo, useRef, useState } from "react";
 
-// The 'isDark' flag ensures black SVGs become white/bright in your dark UI
 type Logo = { src: string; alt: string; isDark?: boolean };
 
 const SKILLS: Logo[] = [
-  { src: "/logos/react.svg", alt: "React" },
-  { src: "/logos/nextjs.svg", alt: "Next.js", isDark: true },
-  { src: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/typescript/typescript-original.svg", alt: "TypeScript" },
-  { src: "/logos/tailwind.svg", alt: "Tailwind" },
-  { src: "/logos/javascript.svg", alt: "JavaScript" },
-  { src: "/logos/pro.svg", alt: "Premiere Pro" },
-  // Marked Cinema 4D/Blender as isDark to ensure it pops against the black background
-  { src: "/logos/cinema4d.svg", alt: "Cinema 4D", isDark: true }, 
-  { src: "/logos/node.svg", alt: "Node.js" },
-  { src: "/logos/github.svg", alt: "GitHub", isDark: true },
-  { src: "/logos/html.svg", alt: "HTML" },
-  { src: "/logos/css.svg", alt: "CSS" },
+  { src: "/assets/icon/logos/react.svg", alt: "React" },
+  { src: "/assets/icon/logos/nextjs.svg", alt: "Next.js", isDark: true },
+  { src: "/assets/icon/logos/typescript.svg", alt: "TypeScript" },
+  { src: "/assets/icon/logos/tailwind.svg", alt: "Tailwind" },
+  { src: "/assets/icon/logos/javascript.svg", alt: "JavaScript" },
+  { src: "/assets/icon/logos/pro.svg", alt: "Premiere Pro" },
+  { src: "/assets/icon/logos/cinema4d.svg", alt: "Cinema 4D", isDark: true }, 
+  { src: "/assets/icon/logos/node.svg", alt: "Node.js" },
+  { src: "/assets/icon/logos/github.svg", alt: "GitHub", isDark: true },
+  // Setting HTML and CSS to isDark: true will force them to be white, matching the other icons perfectly
+  { src: "/assets/icon/logos/html.svg", alt: "HTML", isDark: true },
+  { src: "/assets/icon/logos/css.svg", alt: "CSS", isDark: true },
 ];
 
 export default function SkillsLogoMarquee() {
@@ -30,7 +29,12 @@ export default function SkillsLogoMarquee() {
     <div className="relative w-full py-24 overflow-hidden bg-transparent">
       <div className="relative z-10 space-y-16">
         <header className="max-w-7xl mx-auto px-6">
-           <motion.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} className="flex items-center gap-6">
+           <motion.div 
+             initial={{ opacity: 0, x: -20 }} 
+             whileInView={{ opacity: 1, x: 0 }} 
+             viewport={{ once: true }}
+             className="flex items-center gap-6"
+           >
             <h3 className="text-2xl md:text-3xl font-black text-white uppercase tracking-[0.3em]">
               Tech Stack<span className="text-blue-500">.</span>
             </h3>
@@ -38,9 +42,9 @@ export default function SkillsLogoMarquee() {
           </motion.div>
         </header>
 
-        <div className="flex flex-col gap-20">
-          <MarqueeRow items={row1} direction="left" speed={50} />
-          <MarqueeRow items={row2} direction="right" speed={60} />
+        <div className="flex flex-col gap-12 md:gap-20">
+          <MarqueeRow items={row1} direction="left" speed={40} />
+          <MarqueeRow items={row2} direction="right" speed={50} />
         </div>
       </div>
     </div>
@@ -53,7 +57,7 @@ function MarqueeRow({ items, direction, speed }: { items: Logo[], direction: "le
       <motion.div
         animate={{ x: direction === "left" ? [0, -1800] : [-1800, 0] }}
         transition={{ duration: speed, repeat: Infinity, ease: "linear" }}
-        className="flex gap-16 px-8 flex-nowrap"
+        className="flex gap-8 md:gap-16 px-8 flex-nowrap"
       >
         {items.map((logo, i) => (
           <SkillCard key={`${logo.alt}-${i}`} logo={logo} />
@@ -90,38 +94,34 @@ function SkillCard({ logo }: { logo: Logo }) {
       style={{ rotateX, rotateY, perspective: 1000 }}
       animate={{ y: [0, -8, 0] }}
       transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-      className="relative w-32 h-32 md:w-36 md:h-36 flex items-center justify-center bg-[#080808] rounded-[2.5rem] border border-white/10 group"
+      className="relative w-28 h-28 md:w-36 md:h-36 flex items-center justify-center bg-[#080808] rounded-[2rem] md:rounded-[2.5rem] border border-white/10 group cursor-none"
     >
-      {/* Dynamic Background Glow to ensure silhouette visibility */}
-      <div className="absolute z-20 w-16 h-16 bg-blue-500/20 blur-[20px] rounded-full opacity-40 group-hover:opacity-100 transition-opacity duration-500" />
+      <div className="absolute z-20 w-16 h-16 bg-blue-500/10 blur-[25px] rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+      <div className="absolute inset-[1px] bg-[#0c0c0c] rounded-[1.9rem] md:rounded-[2.4rem] z-10" />
 
-      {/* Inner Card Body */}
-      <div className="absolute inset-[1.5px] bg-[#0c0c0c] rounded-[2.4rem] z-10" />
-
-      {/* Logo Container */}
-      <div className="relative z-30 w-16 h-16 transition-all duration-500 group-hover:scale-110">
+      <div className="relative z-30 w-12 h-12 md:w-16 md:h-16 transition-all duration-500 group-hover:scale-110">
         <Image
           src={logo.src}
           alt={logo.alt}
           fill
           className="object-contain"
           style={{
-            // filter: brightness(0) invert(1) turns black SVGs into white.
-            // brightness(2) makes them glow slightly more.
+            // By setting HTML/CSS to isDark: true in the array above, 
+            // they now use this high-contrast filter to appear perfectly white.
             filter: logo.isDark 
-              ? "brightness(0) invert(1) brightness(2) drop-shadow(0 0 3px rgba(255,255,255,0.3))" 
-              : "drop-shadow(0 0 8px rgba(59, 130, 246, 0.3))"
+              ? "brightness(0) invert(1) brightness(1.5)" 
+              : "none"
           }}
         />
       </div>
 
-      {/* Floating Tooltip */}
       <motion.div
+        initial={{ opacity: 0, y: 10 }}
         animate={{ 
           opacity: isHovered ? 1 : 0,
-          y: isHovered ? -12 : 0 
+          y: isHovered ? -15 : 0 
         }}
-        className="absolute -top-10 px-3 py-1 bg-blue-950/40 border border-blue-500/30 text-blue-400 text-[10px] font-bold uppercase tracking-widest rounded-md z-50 backdrop-blur-md pointer-events-none"
+        className="absolute -top-12 px-3 py-1 bg-zinc-900 border border-white/10 text-white text-[9px] font-bold uppercase tracking-widest rounded shadow-xl z-50 pointer-events-none"
       >
         {logo.alt}
       </motion.div>

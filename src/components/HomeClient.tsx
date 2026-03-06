@@ -1,28 +1,94 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import {
-  motion,
-  AnimatePresence,
-  useSpring,
-  useMotionValue,
-  useMotionTemplate,
-  type Variants,
-} from "framer-motion";
+import { useEffect, useState, useRef } from "react";
+import { motion, AnimatePresence, type Variants } from "framer-motion";
 import Link from "next/link";
 import { Download, Code2, Cpu, Palette, Box, ArrowUpRight } from "lucide-react"; 
 import { Typewriter } from "react-simple-typewriter";
+import gsap from "gsap";
 
 import Header from "@/components/Header";
 import Preloader from "@/components/Preloader";
 import Experience from "@/components/Experience";
 import ProjectBanner from "@/components/ProjectBanner";
-import Skils from "@/components/Skils";
+import Skils from "@/components/Skils"; 
 import MyStory from "@/components/MyStory_temp";
 import GraduationScrollVideo from "@/components/GraduationScrollVideo";
 
 const PROFILE_SRC = "/mypicture.png";
 const HERO_BG_VIDEO_SRC = "/stars.mp4";
+
+// --- OPTIMIZED HIGH-PERFORMANCE CURSOR ---
+const CustomCursor = () => {
+  const cursorRef = useRef<HTMLDivElement>(null);
+  const followerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!cursorRef.current || !followerRef.current) return;
+
+    // quickTo is much faster for mouse movement than gsap.to
+    const xTo = gsap.quickTo(cursorRef.current, "x", { duration: 0.2, ease: "power3" });
+    const yTo = gsap.quickTo(cursorRef.current, "y", { duration: 0.2, ease: "power3" });
+    
+    const xFollowerTo = gsap.quickTo(followerRef.current, "x", { duration: 0.6, ease: "power3" });
+    const yFollowerTo = gsap.quickTo(followerRef.current, "y", { duration: 0.6, ease: "power3" });
+
+    const moveCursor = (e: MouseEvent) => {
+      xTo(e.clientX);
+      yTo(e.clientY);
+      xFollowerTo(e.clientX);
+      yFollowerTo(e.clientY);
+    };
+
+    const handlePointerOver = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      if (target.closest("a, button, .interactive")) {
+        gsap.to(followerRef.current, { 
+          scale: 2.5, 
+          backgroundColor: "rgba(37, 99, 235, 0.2)", 
+          duration: 0.3 
+        });
+      }
+    };
+
+    const handlePointerOut = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      if (target.closest("a, button, .interactive")) {
+        gsap.to(followerRef.current, { 
+          scale: 1, 
+          backgroundColor: "rgba(37, 99, 235, 0.6)", 
+          duration: 0.3 
+        });
+      }
+    };
+
+    window.addEventListener("mousemove", moveCursor);
+    window.addEventListener("mouseover", handlePointerOver);
+    window.addEventListener("mouseout", handlePointerOut);
+
+    return () => {
+      window.removeEventListener("mousemove", moveCursor);
+      window.removeEventListener("mouseover", handlePointerOver);
+      window.removeEventListener("mouseout", handlePointerOut);
+    };
+  }, []);
+
+  return (
+    <>
+      {/* will-change-transform tells the browser to use GPU acceleration */}
+      <div 
+        ref={cursorRef} 
+        className="fixed top-0 left-0 w-2 h-2 bg-white rounded-full pointer-events-none z-[100] mix-blend-difference will-change-transform" 
+        style={{ transform: "translate(-50%, -50%)" }}
+      />
+      <div 
+        ref={followerRef} 
+        className="fixed top-0 left-0 w-12 h-12 bg-blue-600/60 rounded-full pointer-events-none z-[99] blur-[2px] shadow-[0_0_20px_rgba(37,99,235,0.4)] transition-colors will-change-transform" 
+        style={{ transform: "translate(-50%, -50%)" }}
+      />
+    </>
+  );
+};
 
 const easeOut = [0.22, 1, 0.36, 1] as const;
 
@@ -43,18 +109,10 @@ const rise: Variants = {
 
 export default function HomeClient() {
   const [loading, setLoading] = useState(true);
-  
-  // Smooth mouse movement for the radial glow
-  const mouseX = useSpring(useMotionValue(0), { stiffness: 500, damping: 50 });
-  const mouseY = useSpring(useMotionValue(0), { stiffness: 500, damping: 50 });
-
-  function handleMouseMove({ clientX, clientY }: React.MouseEvent) {
-    mouseX.set(clientX);
-    mouseY.set(clientY);
-  }
 
   useEffect(() => {
-    const t = setTimeout(() => setLoading(false), 900);
+    // Increased to 5.5s to allow the 5s Preloader to finish smoothly
+    const t = setTimeout(() => setLoading(false), 5500); 
     return () => clearTimeout(t);
   }, []);
 
@@ -66,34 +124,34 @@ export default function HomeClient() {
   ];
 
   return (
-    <div className="transition-colors duration-300 selection:bg-blue-500/30">
-      <AnimatePresence>{loading && <Preloader />}</AnimatePresence>
+    <div className="transition-colors duration-300 selection:bg-blue-500/30 lg:cursor-none bg-black min-h-screen">
+      <AnimatePresence>
+        {loading && <Preloader key="preloader-comp" />}
+      </AnimatePresence>
+      
+      {/* Cursor only active when not loading and on desktop */}
+      <div className="hidden lg:block">
+        {!loading && <CustomCursor />}
+      </div>
+
       <Header />
 
-      <div className="dark bg-black text-white">
+      <div className="dark text-white">
         <section
           id="home"
-          onMouseMove={handleMouseMove}
           className="relative min-h-screen flex items-center justify-center overflow-hidden"
         >
-          {/* MOUSE GLOW EFFECT */}
-          <motion.div
-            className="pointer-events-none fixed inset-0 z-30 opacity-60"
-            style={{
-              background: useMotionTemplate`
-                radial-gradient(650px circle at ${mouseX}px ${mouseY}px, rgba(37,99,235,0.15), transparent 80%)
-              `,
-            }}
-          />
-
-          {/* BACKGROUND */}
+          {/* VIDEO BACKGROUND */}
           <div className="absolute inset-0 z-0">
-            <video
-              className="absolute inset-0 h-full w-full object-cover opacity-40 scale-105"
+            <video 
+              autoPlay 
+              muted 
+              loop 
+              playsInline 
+              className="absolute inset-0 h-full w-full object-cover opacity-40"
               src={HERO_BG_VIDEO_SRC}
-              autoPlay muted loop playsInline
             />
-            <div className="absolute inset-0 bg-black/60 backdrop-blur-[2px]" />
+            <div className="absolute inset-0 bg-black/40 backdrop-blur-[1px]" />
           </div>
 
           <main className="relative z-20 container mx-auto px-6 md:px-12 max-w-7xl">
@@ -103,7 +161,6 @@ export default function HomeClient() {
               variants={container}
               className="flex flex-col lg:flex-row items-center justify-between gap-12"
             >
-              {/* LEFT: TEXT CONTENT */}
               <div className="w-full lg:w-[60%] space-y-8 text-center lg:text-left">
                 <motion.div variants={rise} className="space-y-2">
                   <h2 className="text-lg md:text-xl text-white/60 font-light tracking-wide">
@@ -115,8 +172,6 @@ export default function HomeClient() {
                       <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-blue-600 drop-shadow-[0_0_20px_rgba(37,99,235,0.4)]">
                         Web
                       </span>
-                      
-                      {/* FIXED WRAPPER: Added pb-2 and leading-snug to stop character clipping */}
                       <div className="min-h-[1.1em] overflow-visible pb-2 pt-1 leading-snug">
                         <Typewriter
                           words={["Junior Dev", "Multimedia Developer"]}
@@ -129,7 +184,6 @@ export default function HomeClient() {
                         />
                       </div>
                     </h1>
-                    
                     <motion.div 
                       variants={rise}
                       className="text-xl md:text-2xl font-bold tracking-[0.3em] uppercase opacity-40 mt-2"
@@ -139,14 +193,13 @@ export default function HomeClient() {
                   </div>
                 </motion.div>
 
-                {/* REWRITTEN PROFESSIONAL DESCRIPTION */}
                 <motion.p variants={rise} className="text-base md:text-lg text-white/50 max-w-xl mx-auto lg:mx-0 leading-relaxed">
-                  A versatile <span className="text-white/80">Full-Stack Junior Developer</span> and <span className="text-white/80">IoT student</span>, blending technical engineering with creative <span className="text-white/80">Multimedia 3D</span> expertise to build the next generation of interactive digital experiences.
+                  A versatile <span className="text-white/80">Full-Stack Junior Developer</span> and <span className="text-white/80">IoT student</span>, blending technical engineering with creative <span className="text-white/80">Multimedia 3D</span> expertise.
                 </motion.p>
 
                 <motion.div variants={rise} className="flex flex-wrap gap-4 justify-center lg:justify-start">
                   {stackIcons.map((item, idx) => (
-                    <div key={idx} className="flex items-center justify-center w-12 h-12 rounded-xl bg-white/5 border border-white/10 text-white/40 hover:text-blue-500 hover:border-blue-500/50 transition-all duration-300">
+                    <div key={idx} className="interactive flex items-center justify-center w-12 h-12 rounded-xl bg-white/5 border border-white/10 text-white/40 hover:text-blue-500 hover:border-blue-500/50 transition-all duration-300">
                       {item.icon}
                     </div>
                   ))}
@@ -162,13 +215,11 @@ export default function HomeClient() {
                 </motion.div>
               </div>
 
-              {/* RIGHT: PROFILE PICTURE */}
               <motion.div
                 variants={rise}
                 className="relative w-full lg:w-[40%] flex justify-center lg:justify-end items-end"
               >
                 <div className="absolute bottom-1/4 right-0 w-80 h-80 bg-blue-600/20 rounded-full blur-[100px] pointer-events-none" />
-                
                 <div className="relative z-20">
                   <img
                     src={PROFILE_SRC}
