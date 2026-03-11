@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { Send, Loader2, CheckCircle2, AlertCircle, User, Mail, Bug, MessageSquare } from "lucide-react";
+import { Send, Loader2, CheckCircle2, AlertCircle, User, Mail, MessageSquare, Tag } from "lucide-react";
 
 export default function ContactPage() {
   const [status, setStatus] = useState<"IDLE" | "SENDING" | "SUCCESS" | "ERROR">("IDLE");
@@ -10,7 +10,7 @@ export default function ContactPage() {
     e.preventDefault();
     setStatus("SENDING");
     const formData = new FormData(e.currentTarget);
-    formData.append("access_key", "eda1f62f-b094-47ab-a68d-46fb67a6c698");
+    formData.append("access_key", "YOUR_ACCESS_KEY_HERE");
 
     try {
       const res = await fetch("https://api.web3forms.com/submit", {
@@ -31,23 +31,22 @@ export default function ContactPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] text-white p-6 md:p-12 flex items-center justify-center selection:bg-blue-500/30">
+    <div className="min-h-screen bg-[#0a0a0a] text-white p-6 md:p-12 flex items-center justify-center">
       <div className="w-full max-w-xl">
         <div className="mb-10 text-center">
-          <h1 className="text-5xl font-extrabold tracking-tighter mb-2 italic">BUG REPORT</h1>
-          <p className="text-zinc-500 text-sm uppercase tracking-[0.2em]">Help me improve the system</p>
+          <h1 className="text-5xl font-extrabold tracking-tighter mb-2 italic">CONTACT</h1>
+          <p className="text-zinc-500 text-sm uppercase tracking-[0.2em]">Let's start a conversation</p>
         </div>
         
-        {/* Main Card */}
         <div className="relative bg-zinc-900/40 border border-white/5 rounded-3xl p-8 backdrop-blur-xl shadow-2xl">
           <form onSubmit={handleSubmit} className="space-y-6">
             <input type="checkbox" name="botcheck" className="hidden" />
 
             <div className="grid grid-cols-1 gap-6">
               {[
-                { id: "name", label: "Full Name", icon: <User size={14}/>, type: "text" },
-                { id: "email", label: "Email Address", icon: <Mail size={14}/>, type: "email" },
-                { id: "subject", label: "Bug Subject", icon: <Bug size={14}/>, type: "text" }
+                { id: "name", label: "Name", icon: <User size={14}/>, placeholder: "Your name" },
+                { id: "email", label: "Email", icon: <Mail size={14}/>, placeholder: "your@email.com" },
+                { id: "subject", label: "Subject", icon: <Tag size={14}/>, placeholder: "What's this about?" }
               ].map((field) => (
                 <div key={field.id} className="space-y-2">
                   <label className="text-[10px] font-bold uppercase tracking-widest text-zinc-400 flex items-center gap-2">
@@ -55,29 +54,28 @@ export default function ContactPage() {
                   </label>
                   <input 
                     name={field.id} 
-                    type={field.type} 
+                    type={field.id === "email" ? "email" : "text"} 
                     required 
                     className="w-full bg-zinc-950/50 border border-white/5 rounded-xl px-5 py-4 outline-none focus:border-blue-500/50 focus:bg-blue-500/5 transition-all duration-300 placeholder:text-zinc-700" 
-                    placeholder={`Enter your ${field.label.toLowerCase()}...`}
+                    placeholder={field.placeholder}
                   />
                 </div>
               ))}
 
               <div className="space-y-2">
                 <label className="text-[10px] font-bold uppercase tracking-widest text-zinc-400 flex items-center gap-2">
-                  <MessageSquare size={14}/> Description
+                  <MessageSquare size={14}/> Message
                 </label>
                 <textarea 
-                  name="description" 
+                  name="message" 
                   rows={4} 
                   required 
                   className="w-full bg-zinc-950/50 border border-white/5 rounded-xl px-5 py-4 outline-none focus:border-blue-500/50 focus:bg-blue-500/5 transition-all duration-300 resize-none placeholder:text-zinc-700" 
-                  placeholder="Explain what happened..." 
+                  placeholder="How can I help you?" 
                 />
               </div>
             </div>
 
-            {/* The Submit Button - Placed directly inside form */}
             <button 
               type="submit" 
               disabled={status !== "IDLE"}
@@ -87,10 +85,10 @@ export default function ContactPage() {
                 "bg-white text-black hover:bg-zinc-200"
               }`}
             >
-              {status === "IDLE" && <><Send size={16}/> Submit Report</>}
-              {status === "SENDING" && <><Loader2 size={16} className="animate-spin"/> Transmitting...</>}
-              {status === "SUCCESS" && <><CheckCircle2 size={16}/> Report Received</>}
-              {status === "ERROR" && <><AlertCircle size={16}/> Transmission Failed</>}
+              {status === "IDLE" && <><Send size={16}/> Send Message</>}
+              {status === "SENDING" && <><Loader2 size={16} className="animate-spin"/> Sending...</>}
+              {status === "SUCCESS" && <><CheckCircle2 size={16}/> Message Sent</>}
+              {status === "ERROR" && <><AlertCircle size={16}/> Failed to Send</>}
             </button>
           </form>
         </div>
