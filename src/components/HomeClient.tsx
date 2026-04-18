@@ -1,14 +1,13 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
-import { motion, AnimatePresence, type Variants } from "framer-motion";
+import { useEffect, useRef } from "react";
+import { motion, type Variants } from "framer-motion";
 import Link from "next/link";
 import { Download, Code2, Cpu, Palette, Box, ArrowUpRight } from "lucide-react"; 
 import { Typewriter } from "react-simple-typewriter";
 import gsap from "gsap";
 
-import Header from "@/components/Header";
-import Preloader from "@/components/Preloader";
+// Removed Header and Preloader imports - they are now handled by ClientLayout
 import Experience from "@/components/Experience";
 import ProjectBanner from "@/components/ProjectBanner";
 import Skils from "@/components/Skils"; 
@@ -26,7 +25,6 @@ const CustomCursor = () => {
   useEffect(() => {
     if (!cursorRef.current || !followerRef.current) return;
 
-    // quickTo is much faster for mouse movement than gsap.to
     const xTo = gsap.quickTo(cursorRef.current, "x", { duration: 0.2, ease: "power3" });
     const yTo = gsap.quickTo(cursorRef.current, "y", { duration: 0.2, ease: "power3" });
     
@@ -43,22 +41,14 @@ const CustomCursor = () => {
     const handlePointerOver = (e: MouseEvent) => {
       const target = e.target as HTMLElement;
       if (target.closest("a, button, .interactive")) {
-        gsap.to(followerRef.current, { 
-          scale: 2.5, 
-          backgroundColor: "rgba(37, 99, 235, 0.2)", 
-          duration: 0.3 
-        });
+        gsap.to(followerRef.current, { scale: 2.5, backgroundColor: "rgba(37, 99, 235, 0.2)", duration: 0.3 });
       }
     };
 
     const handlePointerOut = (e: MouseEvent) => {
       const target = e.target as HTMLElement;
       if (target.closest("a, button, .interactive")) {
-        gsap.to(followerRef.current, { 
-          scale: 1, 
-          backgroundColor: "rgba(37, 99, 235, 0.6)", 
-          duration: 0.3 
-        });
+        gsap.to(followerRef.current, { scale: 1, backgroundColor: "rgba(37, 99, 235, 0.6)", duration: 0.3 });
       }
     };
 
@@ -75,17 +65,8 @@ const CustomCursor = () => {
 
   return (
     <>
-      {/* will-change-transform tells the browser to use GPU acceleration */}
-      <div 
-        ref={cursorRef} 
-        className="fixed top-0 left-0 w-2 h-2 bg-white rounded-full pointer-events-none z-[100] mix-blend-difference will-change-transform" 
-        style={{ transform: "translate(-50%, -50%)" }}
-      />
-      <div 
-        ref={followerRef} 
-        className="fixed top-0 left-0 w-12 h-12 bg-blue-600/60 rounded-full pointer-events-none z-[99] blur-[2px] shadow-[0_0_20px_rgba(37,99,235,0.4)] transition-colors will-change-transform" 
-        style={{ transform: "translate(-50%, -50%)" }}
-      />
+      <div ref={cursorRef} className="fixed top-0 left-0 w-2 h-2 bg-white rounded-full pointer-events-none z-[100] mix-blend-difference will-change-transform" style={{ transform: "translate(-50%, -50%)" }} />
+      <div ref={followerRef} className="fixed top-0 left-0 w-12 h-12 bg-blue-600/60 rounded-full pointer-events-none z-[99] blur-[2px] shadow-[0_0_20px_rgba(37,99,235,0.4)] transition-colors will-change-transform" style={{ transform: "translate(-50%, -50%)" }} />
     </>
   );
 };
@@ -108,14 +89,7 @@ const rise: Variants = {
 };
 
 export default function HomeClient() {
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    // Increased to 5.5s to allow the 5s Preloader to finish smoothly
-    const t = setTimeout(() => setLoading(false), 5500); 
-    return () => clearTimeout(t);
-  }, []);
-
+  // Removed local loading state - it's handled globally now
   const stackIcons = [
     { icon: <Code2 size={22} />, label: "React" },
     { icon: <Cpu size={22} />, label: "TypeScript" },
@@ -125,16 +99,11 @@ export default function HomeClient() {
 
   return (
     <div className="transition-colors duration-300 selection:bg-blue-500/30 lg:cursor-none bg-black min-h-screen">
-      <AnimatePresence>
-        {loading && <Preloader key="preloader-comp" />}
-      </AnimatePresence>
       
-      {/* Cursor only active when not loading and on desktop */}
+      {/* 1. Cursor is now always active (since HomeClient only mounts after loading) */}
       <div className="hidden lg:block">
-        {!loading && <CustomCursor />}
+        <CustomCursor />
       </div>
-
-      <Header />
 
       <div className="dark text-white">
         <section
@@ -157,7 +126,7 @@ export default function HomeClient() {
           <main className="relative z-20 container mx-auto px-6 md:px-12 max-w-7xl">
             <motion.div
               initial="hidden"
-              animate={loading ? "hidden" : "show"}
+              animate="show" // Always animate to show
               variants={container}
               className="flex flex-col lg:flex-row items-center justify-between gap-12"
             >

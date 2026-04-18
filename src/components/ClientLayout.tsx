@@ -13,35 +13,39 @@ export default function ClientLayout({
 }: {
   children: React.ReactNode;
 }) {
-
   const [loading, setLoading] = useState(!hasLoaded);
 
   useEffect(() => {
     if (!hasLoaded) {
+      // Synchronized to 4000ms (4 seconds) to match your Preloader animation
       const timer = setTimeout(() => {
         hasLoaded = true;
         setLoading(false);
-      }, 2000);
+      }, 4000);
 
       return () => clearTimeout(timer);
     }
   }, []);
 
-  if (loading) {
-    return <Preloader />;
-  }
-
   return (
-    <div className="relative flex min-h-screen flex-col">
-      <Header />
+    <>
+      {/* 1. Show only Preloader when loading */}
+      {loading ? (
+        <Preloader />
+      ) : (
+        /* 2. Show Main UI only after 4 seconds is over */
+        <div className="relative flex min-h-screen flex-col">
+          <Header />
 
-      <main id="content" className="flex-1">
-        {children}
-      </main>
+          <main id="content" className="flex-1">
+            {children}
+          </main>
 
-      <Footer />
+          <Footer />
 
-      <ScrollButtons />
-    </div>
+          <ScrollButtons />
+        </div>
+      )}
+    </>
   );
 }
