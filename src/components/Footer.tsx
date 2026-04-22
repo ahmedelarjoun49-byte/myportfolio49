@@ -1,86 +1,84 @@
 "use client";
 
+import React, { useRef, useState } from "react";
 import Link from "next/link";
-import { Download, ArrowUpRight, Github, Linkedin, Instagram } from "lucide-react";
-import { motion } from "framer-motion";
+import { Github, Linkedin, Instagram } from "lucide-react";
 
 const Footer = () => {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+  const [opacity, setOpacity] = useState(0);
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!containerRef.current) return;
+    const rect = containerRef.current.getBoundingClientRect();
+    setMousePos({ x: e.clientX - rect.left, y: e.clientY - rect.top });
+  };
+
+  const socials = [
+    { Icon: Github, href: "https://github.com/ahmedelarjoun49-byte", label: "GitHub" },
+    { Icon: Linkedin, href: "https://www.linkedin.com/in/ahmed-el-arjoun-639804305/", label: "LinkedIn" },
+    { Icon: Instagram, href: "https://www.instagram.com/el4rjoun/", label: "Instagram" },
+  ];
+
   return (
-    <footer className="relative w-full pt-20 pb-10 px-4 bg-white dark:bg-[#020617] transition-colors duration-700">
-      <div className="max-w-6xl mx-auto">
-        <div className="relative rounded-[2.5rem] bg-zinc-50 dark:bg-[#020617] border border-zinc-200 dark:border-blue-500/20 shadow-2xl overflow-hidden transition-colors duration-700">
+    <footer className="relative w-full pt-32 pb-20 px-4 bg-white dark:bg-[#030303] transition-colors duration-700 overflow-hidden">
+      
+      {/* Soft Ambient Glow */}
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[300px] bg-[radial-gradient(100%_100%_at_50%_0%,rgba(37,99,235,0.02)_0%,transparent_90%)] pointer-events-none" />
+
+      <div className="max-w-5xl mx-auto">
+        <div 
+          ref={containerRef}
+          onMouseMove={handleMouseMove}
+          onMouseEnter={() => setOpacity(1)}
+          onMouseLeave={() => setOpacity(0)}
+          className="relative rounded-[3rem] bg-zinc-50/30 dark:bg-zinc-950/20 border border-zinc-200/50 dark:border-white/5 backdrop-blur-3xl overflow-hidden py-16 px-8 md:px-20 group transition-all duration-700 hover:border-blue-500/10"
+        >
           
-          {/* Main Content Area */}
-          <div className="p-8 md:p-12 lg:p-16 grid grid-cols-1 lg:grid-cols-3 gap-12 items-start">
+          {/* Subtle Mouse-Tracking Glow */}
+          <div 
+            className="pointer-events-none absolute inset-0 transition-opacity duration-1000"
+            style={{
+              opacity,
+              background: `radial-gradient(500px circle at ${mousePos.x}px ${mousePos.y}px, rgba(37,99,235,0.04), transparent 60%)`
+            }}
+          />
+
+          <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-10">
             
-            {/* Left: Navigation & Socials */}
-            <div className="space-y-10">
-              <div>
-                <h4 className="text-[10px] font-black text-blue-600 dark:text-blue-500 uppercase tracking-[0.3em] mb-6">Navigation</h4>
-                <nav className="flex flex-col gap-3 text-sm font-bold text-zinc-500 dark:text-slate-400 uppercase tracking-widest">
-                  <Link href="/" className="hover:text-blue-600 dark:hover:text-blue-500 transition-colors">Home</Link>
-                  <Link href="/projects" className="hover:text-blue-600 dark:hover:text-blue-500 transition-colors">Projects</Link>
-                  <Link href="/about" className="hover:text-blue-600 dark:hover:text-blue-500 transition-colors">About</Link>
-                </nav>
-              </div>
-              <div>
-                <h4 className="text-[10px] font-black text-blue-600 dark:text-blue-500 uppercase tracking-[0.3em] mb-6">Socials</h4>
-                <div className="flex gap-4">
-                  {[Github, Linkedin, Instagram].map((Icon, idx) => (
-                    <Link 
-                      key={idx} 
-                      href="#" 
-                      className="p-3 bg-white dark:bg-white/5 border border-zinc-200 dark:border-white/10 rounded-xl hover:bg-blue-600 dark:hover:bg-blue-600 group transition-all hover:-translate-y-1 shadow-sm dark:shadow-none"
-                    >
-                      <Icon size={18} className="text-zinc-700 dark:text-white group-hover:text-white transition-colors" />
-                    </Link>
-                  ))}
-                </div>
-              </div>
-            </div>
-
-            {/* Center: CTA */}
-            <div className="text-center lg:border-x border-zinc-200 dark:border-white/5 lg:px-10">
-              <h3 className="text-3xl md:text-4xl font-black text-zinc-900 dark:text-white uppercase leading-tight mb-4">
-                Let's Craft The <br /><span className="text-blue-600 italic">Future.</span>
-              </h3>
-              <p className="text-zinc-600 dark:text-slate-400 text-sm font-medium mb-8 max-w-[280px] mx-auto">
-                Ready to translate your vision into a high-end digital reality?
+            {/* Identity Block */}
+            <div className="text-center md:text-left">
+              <h2 className="text-3xl md:text-4xl font-black tracking-tighter dark:text-white text-zinc-900 uppercase">
+                Ahmed El Arjoun<span className="text-blue-600">.</span>
+              </h2>
+              <p className="mt-1 text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-[0.4em]">
+                Multimedia Developer
               </p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Link href="/contact" className="bg-blue-600 px-8 py-4 rounded-2xl text-white font-black uppercase tracking-widest text-xs shadow-[0_10px_20px_rgba(37,99,235,0.3)] hover:scale-105 transition-all flex items-center gap-2 justify-center">
-                  Get In Touch <ArrowUpRight size={16} />
-                </Link>
-                <Link href="#" className="bg-white dark:bg-white/5 border border-zinc-200 dark:border-white/10 px-8 py-4 rounded-2xl text-zinc-900 dark:text-white font-black uppercase tracking-widest text-xs hover:bg-zinc-900 hover:text-white dark:hover:bg-white dark:hover:text-black transition-all flex items-center gap-2 justify-center shadow-sm dark:shadow-none">
-                  <Download size={16} /> CV
-                </Link>
-              </div>
             </div>
 
-            {/* Right: Copyright & Stack */}
-            <div className="lg:text-right flex flex-col justify-between h-full">
-              <div>
-                <p className="text-sm font-black text-zinc-900 dark:text-white uppercase tracking-widest">© 2026 AHMED EL ARJOUN.</p>
-                <p className="text-xs text-zinc-500 dark:text-slate-500 mt-2 font-medium">ae</p>
-              </div>
-              <div className="mt-12">
-                <span className="text-[10px] font-black text-blue-600 dark:text-blue-500 uppercase tracking-widest block mb-2">Stack</span>
-                <p className="text-[10px] text-zinc-500 dark:text-slate-500 font-bold uppercase tracking-tighter">
-                  Next.js • Tailwind • Framer Motion
-                </p>
-              </div>
+            {/* Clean Social Icons */}
+            <div className="flex items-center gap-4">
+              {socials.map((social, idx) => (
+                <Link 
+                  key={idx} 
+                  href={social.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="h-12 w-12 flex items-center justify-center bg-white dark:bg-zinc-900/30 border border-zinc-200 dark:border-white/5 rounded-2xl hover:border-blue-600/40 transition-all duration-500 hover:-translate-y-1 hover:shadow-[0_10px_20px_-10px_rgba(37,99,235,0.1)] group/icon"
+                >
+                  <social.Icon size={20} strokeWidth={1.5} className="text-zinc-500 dark:text-zinc-400 group-hover/icon:text-blue-600 transition-colors" />
+                   <span className="sr-only">{social.label}</span>
+                </Link>
+              ))}
             </div>
           </div>
 
-          {/* Status Bar */}
-          <div className="bg-blue-50 dark:bg-blue-600/5 border-t border-zinc-200 dark:border-white/5 py-4 px-8 flex items-center justify-center gap-3">
-            <span className="relative flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-blue-600 dark:bg-blue-500"></span>
-            </span>
-            <span className="text-[10px] font-black text-blue-600 dark:text-blue-400/80 uppercase tracking-[0.2em]">
-              Open for Internships • Freelance • Partnerships
-            </span>
+          {/* Minimal Copyright Bottom Right */}
+          <div className="absolute bottom-6 right-10">
+             <span className="text-[9px] font-medium text-zinc-400 dark:text-zinc-600 uppercase tracking-widest opacity-50 group-hover:opacity-100 transition-opacity duration-700">
+               © 2026
+             </span>
           </div>
         </div>
       </div>

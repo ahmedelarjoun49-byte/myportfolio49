@@ -151,49 +151,58 @@ function InternshipCard({ item, index, onOpenProof }: {
   const cardOpacity = useTransform(scrollYProgress, [0.1, 0.3, 0.8, 0.9], [0, 1, 1, 0]);
   const cardScale = useTransform(scrollYProgress, [0.1, 0.3], [0.92, 1]);
 
-  // --- PC Dynamic Transformations ---
-  // Moves right as you scroll down
-  const pcX = useTransform(scrollYProgress, [0, 1], [0, 150]); 
-  // Grows significantly bigger
-  const pcSizeScale = useTransform(scrollYProgress, [0, 1], [0.8, 1.8]);
-  // Intensifies blur as it moves/scales
-  const pcBlur = useTransform(scrollYProgress, [0.4, 1], [0, 15]);
-  const pcBlurFilter = useMotionTemplate`blur(${pcBlur}px)`;
+  // --- PC Dynamic High-End Transformations ---
+  const pcX = useSpring(useTransform(scrollYProgress, [0, 1], [-100, 200]), { stiffness: 30, damping: 20 });
+  const pcY = useSpring(useTransform(scrollYProgress, [0, 1], [100, -100]), { stiffness: 30, damping: 20 });
+  const pcRotate = useSpring(useTransform(scrollYProgress, [0, 1], [-15, 10]), { stiffness: 30, damping: 20 });
+  const pcScale = useTransform(scrollYProgress, [0, 0.5, 1], [1.2, 1.8, 2.2]);
+  const pcOpacity = useTransform(scrollYProgress, [0, 0.4, 0.6, 1], [0, 0.6, 0.6, 0]);
 
   return (
-    <motion.div ref={cardRef} style={{ opacity: cardOpacity, scale: cardScale }} className="relative w-full flex items-center">
+    <motion.div ref={cardRef} style={{ opacity: cardOpacity, scale: cardScale }} className="relative w-full flex items-center min-h-[600px]">
       
       {/* --- ASUS PC BACKGROUND EFFECT --- */}
       {item.company === "Next Level" && (
-        <motion.div 
-          style={{ 
-            x: pcX, 
-            scale: pcSizeScale,
-            filter: pcBlurFilter
-          }}
-          className="absolute -top-40 -right-40 w-[800px] h-[800px] opacity-30 dark:opacity-60 pointer-events-none z-0 hidden lg:block"
-        >
-          <Image 
-            src="/pictures/asus.png" 
-            alt="Asus ROG Background" 
-            fill 
-            className="object-contain"
-            style={{
-                maskImage: 'radial-gradient(circle, black 30%, transparent 80%)',
-                WebkitMaskImage: 'radial-gradient(circle, black 30%, transparent 80%)'
+        <div className="absolute inset-0 pointer-events-none overflow-visible z-0 hidden lg:block">
+           <motion.div 
+            style={{ 
+              x: pcX,
+              y: pcY,
+              rotateZ: pcRotate,
+              scale: pcScale,
+              opacity: pcOpacity,
             }}
-          />
-        </motion.div>
+            className="absolute top-0 right-[-10%] w-[900px] h-[900px]"
+          >
+            <div className="relative w-full h-full">
+              <Image 
+                src="/pictures/asus.png" 
+                alt="Asus ROG Background" 
+                fill 
+                className="object-contain drop-shadow-[0_0_100px_rgba(37,99,235,0.3)]"
+                style={{
+                    maskImage: 'radial-gradient(circle, black 40%, transparent 85%)',
+                    WebkitMaskImage: 'radial-gradient(circle, black 40%, transparent 85%)'
+                }}
+              />
+              <motion.div 
+                animate={{ opacity: [0.2, 0.5, 0.2] }}
+                transition={{ duration: 4, repeat: Infinity }}
+                className="absolute inset-0 bg-blue-500/20 blur-[150px] rounded-full scale-50"
+              />
+            </div>
+          </motion.div>
+        </div>
       )}
 
       <div className="relative z-20 w-full grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-20 items-center">
         <div className={`lg:col-span-7 ${isVideoLeft ? 'lg:order-2' : 'lg:order-1'}`}>
-          <div className="group relative aspect-video rounded-[2rem] overflow-hidden border border-zinc-200 dark:border-blue-500/30 shadow-2xl bg-zinc-100 dark:bg-black">
+          <div className="group relative aspect-video rounded-[2rem] overflow-hidden border border-zinc-200 dark:border-blue-500/30 shadow-2xl bg-zinc-100/50 dark:bg-black/50 backdrop-blur-md">
             <MediaDisplay videoUrl={item.videoUrl} preview={item.preview} title={item.title} />
           </div>
         </div>
 
-        <div className={`lg:col-span-5 ${isVideoLeft ? 'lg:order-1' : 'lg:order-2'}`}>
+        <div className={`lg:col-span-5 ${isVideoLeft ? 'lg:order-1' : 'lg:order-2'} backdrop-blur-[2px]`}>
           <div className="space-y-8">
             <div className="space-y-4">
               <span className="inline-flex items-center gap-2 text-[10px] font-bold text-blue-600 dark:text-blue-400 uppercase tracking-widest bg-blue-500/10 px-4 py-2 rounded-full border border-blue-500/20">

@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useRef } from "react";
+import { useRef } from "react";
 import Image from "next/image";
 import {
   motion,
@@ -8,8 +8,6 @@ import {
   useSpring,
   useTransform,
   useMotionTemplate,
-  useReducedMotion,
-  MotionValue,
 } from "framer-motion";
 
 type Props = {
@@ -20,30 +18,13 @@ type Props = {
   year?: string;
 };
 
-function clamp01(v: number) {
-  return Math.max(0, Math.min(1, v));
-}
-
-function useLineReveal(p: MotionValue<number>, i: number, base = 0.35, step = 0.05) {
-  const start = base + i * step;
-  const end = start + 0.1;
-  const t = useTransform(p, (v) => clamp01((v - start) / (end - start)));
-
-  return {
-    opacity: useTransform(t, [0, 1], [0, 1]),
-    y: useTransform(t, [0, 1], [10, 0]),
-    filter: useTransform(t, [0, 0.8, 1], ["blur(4px)", "blur(0px)", "blur(0px)"]),
-  };
-}
-
-export default function GraduationHero({
-  src = "/mypicture.png", 
-  initialBgSrc = "/pictures/avatar11.jpg", 
-  staticBgSrc = "/photooos/micro3.png", 
+export default function GraduationElevatedHero({
+  src = "/mypicture.png",
+  initialBgSrc = "/pictures/avatar11.jpg",
+  staticBgSrc = "/photooos/micro3.png",
   subtitle = "Licence • Développement Multimédia 3D & Web",
   year = "2025",
 }: Props) {
-  const reduceMotion = useReducedMotion();
   const containerRef = useRef<HTMLElement | null>(null);
 
   const { scrollYProgress } = useScroll({
@@ -52,121 +33,123 @@ export default function GraduationHero({
   });
 
   const p = useSpring(scrollYProgress, {
-    stiffness: 100,
+    stiffness: 140,
     damping: 30,
     restDelta: 0.001,
   });
 
-  const initialOpacity = useTransform(p, [0, 0.3], [1, 0]);
-  const initialScale = useTransform(p, [0, 0.3], [1, 1.05]);
-  
-  const campusOpacity = useTransform(p, [0.1, 0.4], [0, 1]);
-  
-  // FIXED: Campus background now stays at a 4px blur instead of going to 0
-  const campusBlur = useTransform(p, [0.1, 0.4], [12, 4]); 
-  
-  const campusScale = useTransform(p, [0.1, 0.5], [1.08, 1]); 
+  // --- Background: Sharpens and darkens slightly for focus ---
+  const bgOpacity = useTransform(p, [0, 0.2], [0.7, 0.45]);
+  const bgBlur = useTransform(p, [0, 0.25], [15, 0]);
+  const bgScale = useTransform(p, [0, 0.4], [1.05, 1]);
 
-  const split = useTransform(p, [0.05, 0.35], [0, 1]);
-  const photoX = useTransform(split, [0, 1], ["0%", "-38%"]); 
-  const textX = useTransform(split, [0, 1], ["0%", "32%"]);
-  const photoRotateY = useTransform(split, [0, 1], [0, 12]);
-  const textOpacity = useTransform(split, [0.1, 0.35], [0, 1]);
+  // --- Vertical Positioning (Fixed "Too Low" issue) ---
+  // We move the entire stage UP by -100px to avoid the bottom-heavy look
+  const globalY = useTransform(p, [0, 0.3], [80, -100]);
 
-  const lines = useMemo(() => [
-    "In 2024–2025, I completed my Licence in Développement Multimédia 3D & Web.",
-    "Focusing on clean web engineering, UI craft, and strong technical foundations.",
-    "This experience shaped how I build today: performance-first and detail-oriented.",
-  ], []);
+  // --- Card Reveal Logic (Fast & Deep) ---
+  // Photo: Moves left and adds a slight 3D tilt
+  const photoX = useTransform(p, [0.05, 0.25], [0, -280]);
+  const photoRotate = useTransform(p, [0.05, 0.25], [0, -8]);
+  const photoZ = useTransform(p, [0.05, 0.25], [0, 50]); // Moves "toward" user
 
-  const [l0, l1, l2] = [useLineReveal(p, 0), useLineReveal(p, 1), useLineReveal(p, 2)];
-  const progressW = useTransform(p, [0.35, 0.8], ["0%", "100%"]);
+  // Text: Slices in from behind with scaling
+  const textX = useTransform(p, [0.1, 0.3], [0, 280]);
+  const textScale = useTransform(p, [0.1, 0.3], [0.9, 1]);
+  const textOpacity = useTransform(p, [0.1, 0.25], [0, 1]);
+
+  const lines = [
+    "Bridging the gap between 3D visualization and modern web logic.",
+    "Specialized in high-performance React architectures and UI motion.",
+    "Turning complex technical foundations into seamless user experiences.",
+  ];
 
   return (
-    <section ref={containerRef} className="relative h-[220vh] w-full bg-black antialiased">
-      <div className="sticky top-0 z-0 h-screen w-full overflow-hidden bg-black">
-        <motion.div style={{ opacity: initialOpacity, scale: initialScale }} className="absolute inset-0">
-          <Image src={initialBgSrc} alt="Intro" fill className="object-cover" priority />
-          <div className="absolute inset-0 bg-black/40" />
-        </motion.div>
-
+    <section ref={containerRef} className="relative h-[180vh] w-full bg-black antialiased overflow-hidden">
+      
+      {/* Pinned Background */}
+      <div className="sticky top-0 z-0 h-screen w-full overflow-hidden">
         <motion.div 
           style={{ 
-            opacity: campusOpacity, 
-            filter: useMotionTemplate`blur(${campusBlur}px)`,
-            scale: campusScale
+            opacity: bgOpacity, 
+            scale: bgScale,
+            filter: useMotionTemplate`blur(${bgBlur}px)` 
           }} 
-          className="absolute inset-0 z-10"
+          className="absolute inset-0"
         >
-          <Image src={staticBgSrc} alt="Campus" fill className="object-cover" quality={100} />
-          {/* Subtle overlay to keep the focus on the card */}
-          <div className="absolute inset-0 bg-black/30 bg-gradient-to-b from-black/60 via-transparent to-black" />
+          <Image src={staticBgSrc} alt="Campus" fill className="object-cover" priority />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-black" />
         </motion.div>
       </div>
 
-      <div className="sticky top-0 z-30 flex h-screen items-center justify-center perspective-2000">
-        <div className="relative w-full max-w-6xl px-6">
-          <div className="relative flex flex-col items-center justify-center lg:block">
-            
-            <motion.div
-              style={{
-                x: reduceMotion ? 0 : photoX,
-                rotateY: reduceMotion ? 0 : photoRotateY,
-                transformPerspective: 1800,
-              }}
-              className="relative z-40 aspect-[16/11] w-full max-w-[540px] mx-auto lg:mx-0"
-            >
-              <div className="absolute inset-0 bg-blue-600/20 rounded-[32px] blur-[60px] pointer-events-none" />
-              
-              <div className="relative h-full w-full rounded-[32px] overflow-hidden border border-white/10 bg-white/5 backdrop-blur-3xl shadow-2xl">
-                <Image 
-                  src={src} 
-                  alt="Ahmed Portrait" 
-                  fill 
-                  className="object-contain object-bottom drop-shadow-[0_0_20px_rgba(37,99,235,0.4)]" 
-                  quality={100} 
-                />
-                <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-black/60 to-transparent" />
+      {/* Main Content Stage */}
+      <div className="sticky top-0 z-30 flex h-screen items-center justify-center">
+        <motion.div 
+          style={{ y: globalY }}
+          className="relative flex w-full max-w-7xl items-center justify-center px-6"
+        >
+          
+          {/* Portrait Card */}
+          <motion.div
+            style={{ x: photoX, rotateZ: photoRotate, z: photoZ }}
+            className="relative z-50 w-full max-w-[350px] flex-shrink-0"
+          >
+            <div className="relative aspect-[3/4.3] overflow-hidden rounded-[32px] border border-white/10 bg-zinc-900 shadow-[0_30px_60px_rgba(0,0,0,0.6)]">
+              <Image src={src} alt="Portrait" fill className="object-cover" quality={100} />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-transparent" />
+              <div className="absolute bottom-8 left-8 flex flex-col gap-1">
+                <span className="text-[10px] font-black tracking-[0.3em] text-emerald-400 uppercase">
+                  Authenticated // {year}
+                </span>
+                <p className="text-[10px] font-mono text-white/40 tracking-wider uppercase">Graduate.Identity.v3</p>
               </div>
-            </motion.div>
+            </div>
+          </motion.div>
 
-            <motion.div
-              style={{ x: reduceMotion ? 0 : textX, opacity: textOpacity }}
-              className="absolute inset-0 hidden items-center justify-center lg:flex pointer-events-none"
-            >
-              <div className="pointer-events-auto w-full max-w-[460px] rounded-[45px] border border-white/10 bg-black/80 p-12 shadow-2xl backdrop-blur-3xl">
-                <div className="relative space-y-8">
-                  <div className="space-y-3">
-                    <div className="h-1.5 w-14 bg-blue-600 rounded-full" />
-                    <h2 className="text-2xl font-black text-white leading-tight">{subtitle}</h2>
-                    <p className="text-[11px] font-extrabold uppercase tracking-[0.4em] text-blue-400">Class of {year}</p>
-                  </div>
+          {/* Info Card */}
+          <motion.div
+            style={{ x: textX, scale: textScale, opacity: textOpacity }}
+            className="absolute z-40 w-full max-w-[540px]"
+          >
+            <div className="relative rounded-[48px] border border-white/5 bg-zinc-950/70 p-12 lg:p-16 backdrop-blur-3xl shadow-2xl overflow-hidden">
+              {/* Subtle Ambient Light Corner */}
+              <div className="absolute -top-12 -right-12 h-40 w-40 bg-emerald-500/10 blur-[80px]" />
+              
+              <div className="relative space-y-10">
+                <div className="space-y-4">
+                  <div className="h-1 w-16 bg-emerald-500 rounded-full" />
+                  <h2 className="text-5xl lg:text-6xl font-black text-white uppercase italic leading-[0.9] tracking-tighter">
+                    Creative <br /> 
+                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-blue-400 to-blue-600">
+                       Developer
+                    </span>
+                  </h2>
+                  <p className="text-xs font-bold text-zinc-500 tracking-[0.4em] uppercase pt-2">{subtitle}</p>
+                </div>
 
-                  <div className="space-y-6">
-                    {[l0, l1, l2].map((anim, i) => (
-                      <motion.p
-                        key={i}
-                        style={{ opacity: anim.opacity, y: anim.y, filter: anim.filter as any }}
-                        className="text-[17px] font-semibold leading-relaxed text-white/90"
-                      >
-                        {lines[i]}
-                      </motion.p>
-                    ))}
-                  </div>
+                <div className="space-y-6">
+                  {lines.map((line, i) => (
+                    <p key={i} className="text-zinc-400 text-lg font-medium leading-relaxed border-l-2 border-white/5 pl-6">
+                      {line}
+                    </p>
+                  ))}
+                </div>
 
-                  <div className="pt-4">
-                    <div className="h-[5px] w-full bg-white/10 rounded-full overflow-hidden">
-                      <motion.div
-                        style={{ width: progressW }}
-                        className="h-full bg-gradient-to-r from-blue-600 to-sky-400 shadow-[0_0_15px_rgba(59,130,246,0.6)]"
-                      />
-                    </div>
+                {/* Status Bar */}
+                <div className="pt-6 flex items-center gap-4">
+                  <div className="h-1 flex-1 bg-white/5 rounded-full overflow-hidden">
+                    <motion.div 
+                      style={{ width: useTransform(p, [0.15, 0.4], ["0%", "100%"]) }}
+                      className="h-full bg-gradient-to-r from-emerald-500 to-blue-500 shadow-[0_0_15px_rgba(16,185,129,0.5)]"
+                    />
                   </div>
+                  <span className="text-[10px] font-mono text-zinc-600 tracking-widest uppercase">System.Ready</span>
                 </div>
               </div>
-            </motion.div>
-          </div>
-        </div>
+            </div>
+          </motion.div>
+
+        </motion.div>
       </div>
     </section>
   );

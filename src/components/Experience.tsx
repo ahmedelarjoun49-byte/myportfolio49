@@ -1,10 +1,9 @@
 "use client";
 
-import React, { useRef } from "react";
+import React, { useState } from "react";
 import {
   motion,
-  useScroll,
-  useTransform,
+  useMotionValue,
 } from "framer-motion";
 
 type ProcessStep = {
@@ -19,176 +18,180 @@ const LICENCE_PROCESS: ProcessStep[] = [
   {
     year: "Year 01",
     phase: "The Foundation",
-    focus: "Web Basics & First Logic",
+    focus: "Web Architecture",
     milestones: [
-      "Took my first steps into the world of web development.",
-      "Mastered the core pillars: building structures with HTML and styling with CSS.",
-      "Developed my first working logic to bring static designs to life.",
+      "Mastered the core pillars: HTML structure and CSS artistry.",
+      "Developed logic-driven designs to bridge the gap from static to fluid.",
+      "First steps into algorithms and computational thinking.",
     ],
     skills: ["HTML5", "CSS3", "JavaScript", "Algorithms"],
   },
   {
     year: "Year 02",
     phase: "The Backend Shift",
-    focus: "Application Logic & Databases",
+    focus: "Systems & Logic",
     milestones: [
-      "Advanced into software development with C# and the .NET framework.",
-      "Built a fully functional 'Location de Voitures' application for my PFS.",
-      "Deepened my web knowledge by learning PHP and the Laravel framework.",
+      "Advanced into software engineering with C# and .NET frameworks.",
+      "Architected a robust 'Car Rental' ecosystem for my PFS project.",
+      "Deepened back-end fluency with PHP and Laravel ecosystems.",
     ],
     skills: ["C# / .NET", "Laravel", "PHP", "MySQL"],
   },
   {
     year: "Year 03",
     phase: "Multimedia Mastery",
-    focus: "3D Creative Web Development",
+    focus: "3D Creative Web",
     milestones: [
-      "Switched focus to Multimedia to merge creativity with engineering.",
-      "Learned to integrate complex 3D models directly into web interfaces.",
-      "Built my first high-end website using JS technologies for 3D rendering.",
+      "Merged engineering with visual art via Multimedia specialization.",
+      "Integrated high-fidelity 3D models into browser logic.",
+      "Engineered high-end interfaces with Three.js and Next.js.",
     ],
-    skills: ["Three.js", "React Three Fiber", "3D Modeling", "Next.js"],
+    skills: ["Three.js", "R3F", "3D Modeling", "Next.js"],
   },
 ];
 
-export default function LicenceProcess() {
-  const containerRef = useRef<HTMLDivElement>(null);
-  
-  const { scrollYProgress } = useScroll({
-    target: containerRef,
-    offset: ["start start", "end end"] 
-  });
+const DRAG_BUFFER = 50;
+
+export default function LicenceLineage() {
+  const [cardIndex, setCardIndex] = useState(0);
+  const dragX = useMotionValue(0);
+
+  const onDragEnd = () => {
+    const x = dragX.get();
+    if (x <= -DRAG_BUFFER && cardIndex < LICENCE_PROCESS.length - 1) {
+      setCardIndex((pv) => pv + 1);
+    } else if (x >= DRAG_BUFFER && cardIndex > 0) {
+      setCardIndex((pv) => pv - 1);
+    }
+  };
 
   return (
-    <section 
-      ref={containerRef} 
-      className="relative w-full bg-white dark:bg-[#020617] transition-colors duration-700"
-    >
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,#1e40af15,transparent_50%)] pointer-events-none hidden dark:block" />
+    <section className="relative h-screen w-full bg-white dark:bg-[#020617] flex flex-col items-center justify-center overflow-hidden transition-colors duration-500">
+      
+      <div className="absolute inset-0 pointer-events-none overflow-hidden">
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full bg-[radial-gradient(circle_at_center,_rgba(37,99,235,0.03)_0%,_transparent_70%)] dark:bg-[radial-gradient(circle_at_center,_rgba(37,99,235,0.08)_0%,_transparent_60%)]" />
+        <div className="absolute inset-0 opacity-[0.15] dark:opacity-[0.05] mix-blend-overlay bg-[url('https://grainy-gradients.vercel.app/noise.svg')]" />
+      </div>
 
-      <div className="max-w-6xl mx-auto px-6 py-20">
-        <header className="mb-20">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="space-y-4"
-          >
-            <h2 className="text-5xl md:text-8xl font-black text-black dark:text-white tracking-tighter uppercase leading-none">
-              EVOLUTION<span className="text-blue-600">.</span>
-            </h2>
-            <div className="flex items-center gap-4">
-              <div className="h-[2px] w-12 bg-blue-600" />
-              <p className="text-zinc-500 dark:text-blue-400/50 font-mono text-xs uppercase tracking-[0.3em]">
-                The 3-Year Licence Pathway
-              </p>
-            </div>
-          </motion.div>
-        </header>
+      <header className="absolute top-16 text-center z-20 space-y-3">
+        <h2 className="text-6xl md:text-8xl font-black text-zinc-900 dark:text-white tracking-tighter uppercase leading-none">
+          Lineage<span className="text-blue-600">.</span>
+        </h2>
+        <div className="flex items-center justify-center gap-4">
+          <div className="h-[1px] w-12 bg-blue-600/20" />
+          <p className="text-blue-600 dark:text-blue-400 font-mono text-[10px] tracking-[0.5em] uppercase font-black">
+            The Path To Mastery
+          </p>
+          <div className="h-[1px] w-12 bg-blue-600/20" />
+        </div>
+      </header>
 
-        <div className="relative flex flex-col items-center gap-4">
-          {LICENCE_PROCESS.map((step, i) => {
-            // Re-calculated stack logic for 1 -> 2 -> 3 order
-            const targetScale = 1 - ((LICENCE_PROCESS.length - i) * 0.05); 
-            return (
-              <ProcessCard 
-                key={i} 
-                index={i} 
-                progress={scrollYProgress} 
-                range={[i * 0.25, 1]} 
-                targetScale={targetScale}
-                {...step} 
-              />
-            );
-          })}
+      <div className="relative w-full max-w-7xl px-4 flex items-center justify-center">
+        <motion.div
+          drag="x"
+          dragConstraints={{ left: 0, right: 0 }}
+          style={{ x: dragX }}
+          animate={{ x: 0 }}
+          onDragEnd={onDragEnd}
+          className="flex gap-6 md:gap-12 items-center cursor-grab active:cursor-grabbing"
+        >
+          {LICENCE_PROCESS.map((step, i) => (
+            <LineageCard 
+              key={i} 
+              step={step} 
+              index={i} 
+              activeCard={cardIndex} 
+              onClick={() => setCardIndex(i)}
+            />
+          ))}
+        </motion.div>
+      </div>
+
+      <div className="absolute bottom-16 flex items-center gap-8 z-20">
+        <div className="flex gap-2.5">
+          {LICENCE_PROCESS.map((_, i) => (
+            <motion.button
+              key={i}
+              onClick={() => setCardIndex(i)}
+              animate={{ 
+                width: cardIndex === i ? 48 : 12,
+                backgroundColor: cardIndex === i ? "#2563eb" : "rgba(100,100,100,0.3)"
+              }}
+              className="h-1.5 rounded-full transition-all duration-300"
+            />
+          ))}
         </div>
       </div>
-      <div className="h-[20vh]" />
     </section>
   );
 }
 
-interface CardProps extends ProcessStep {
-  index: number;
-  progress: any;
-  range: [number, number];
-  targetScale: number;
-}
-
-function ProcessCard({ 
-  index, 
-  year, 
-  phase, 
-  focus, 
-  milestones, 
-  skills,
-  progress,
-  range,
-  targetScale
-}: CardProps) {
-  const container = useRef(null);
-  const stackScale = useTransform(progress, range, [1, targetScale]);
+function LineageCard({ step, index, activeCard, onClick }: { step: ProcessStep; index: number; activeCard: number; onClick: () => void }) {
+  const isVisible = index === activeCard;
+  const offset = index - activeCard;
 
   return (
-    <div 
-      ref={container} 
-      className="sticky top-[12vh] w-full flex items-center justify-center mb-16"
-      style={{ zIndex: index }}
+    <motion.div
+      onClick={onClick}
+      animate={{
+        scale: isVisible ? 1 : 0.9, // Kept larger for better visibility
+        x: `${offset * 2}%`,
+        opacity: isVisible ? 1 : 0.6, // Increased opacity for "rest visible" look
+        rotateY: offset * 10,
+        filter: isVisible ? "blur(0px)" : "blur(2px)", // Much softer blur
+        zIndex: isVisible ? 10 : 5 - Math.abs(offset),
+      }}
+      whileHover={{ 
+        scale: isVisible ? 1.02 : 0.93,
+        opacity: 1,
+        filter: "blur(0px)",
+      }}
+      transition={{ type: "spring", stiffness: 180, damping: 24 }}
+      className={`relative w-[85vw] md:w-[500px] shrink-0 transition-all ${isVisible ? 'cursor-default' : 'cursor-pointer'}`}
     >
-      <motion.div 
-        style={{ scale: stackScale }}
-        className="group relative overflow-hidden rounded-[2.5rem] md:rounded-[3.5rem] p-[1.5px] w-full max-w-5xl shadow-2xl"
-      >
-        {/* SPINNING BLUE CONTOUR EFFECT */}
-        <motion.div 
-          animate={{ rotate: 360 }}
-          transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
-          className="absolute inset-[-150%] bg-[conic-gradient(from_90deg_at_50%_50%,transparent_0%,#2563eb_20%,transparent_40%,#1d4ed8_70%,transparent_100%)] opacity-40 group-hover:opacity-100 transition-opacity duration-500"
-        />
+      <div className="relative bg-white/70 dark:bg-zinc-950/60 backdrop-blur-2xl rounded-[2.5rem] border border-zinc-200/50 dark:border-white/10 p-10 md:p-14 overflow-hidden shadow-2xl">
+        
+        <div className="absolute -bottom-20 -left-20 w-80 h-80 bg-blue-600/5 dark:bg-blue-500/10 blur-[100px] rounded-full pointer-events-none" />
 
-        {/* MAIN BODY */}
-        <div className="relative bg-zinc-50 dark:bg-gradient-to-b dark:from-[#0b1222] dark:to-[#020617] rounded-[2.5rem] md:rounded-[3.5rem] p-8 md:p-14 h-full w-full border border-white/10 dark:border-blue-500/10 backdrop-blur-3xl">
-          
-          <div className="flex flex-col md:flex-row justify-between items-start gap-6 mb-10">
-            <div>
-              <div className="flex items-center gap-3 mb-3">
-                <span className="text-blue-600 dark:text-blue-400 font-mono text-xs font-bold uppercase tracking-widest">
-                  {year} — {phase}
-                </span>
-                <div className="h-px w-8 bg-zinc-200 dark:bg-blue-500/20" />
-              </div>
-              <h3 className="text-3xl md:text-6xl font-black text-zinc-900 dark:text-slate-50 tracking-tighter leading-tight">
-                {focus}
-              </h3>
+        <div className="relative z-10 space-y-8 pointer-events-none">
+          <header className="space-y-3">
+            <div className="flex items-center gap-3">
+               <span className="px-2 py-1 bg-blue-600 text-white text-[8px] font-black uppercase rounded-md tracking-tighter">
+                {step.year}
+              </span>
+              <span className="text-zinc-400 dark:text-zinc-500 font-mono text-[9px] font-bold uppercase tracking-[0.2em]">
+                {step.phase}
+              </span>
             </div>
-          </div>
+            
+            <h3 className="text-3xl md:text-5xl font-black text-zinc-900 dark:text-white leading-[0.9] tracking-tighter uppercase">
+              {step.focus.split(' ')[0]} <br/>
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-blue-400">
+                {step.focus.split(' ').slice(1).join(' ')}
+              </span>
+            </h3>
+          </header>
 
-          <div className="grid md:grid-cols-12 gap-10">
-            <ul className="md:col-span-8 space-y-6">
-              {milestones.map((bullet, idx) => (
-                <li key={idx} className="flex gap-4 text-zinc-600 dark:text-slate-300 text-sm md:text-xl font-medium leading-relaxed">
-                  <span className="text-blue-600 dark:text-blue-500 flex-shrink-0 mt-1.5">✦</span>
-                  {bullet}
-                </li>
-              ))}
-            </ul>
+          <ul className="space-y-4">
+            {step.milestones.map((m, idx) => (
+              <li key={idx} className="flex gap-4 items-start">
+                <div className="w-1.5 h-1.5 rounded-full bg-blue-600 mt-1.5 shrink-0 shadow-[0_0_8px_rgba(37,99,235,0.4)]" />
+                <p className="text-zinc-600 dark:text-zinc-400 text-xs md:text-sm font-medium leading-relaxed tracking-tight">
+                  {m}
+                </p>
+              </li>
+            ))}
+          </ul>
 
-            <div className="md:col-span-4 flex flex-col justify-end">
-              <p className="text-[10px] font-black text-zinc-400 dark:text-blue-500/50 uppercase tracking-widest mb-4 md:text-right">Tech Stack</p>
-              <div className="flex flex-wrap gap-2 md:justify-end">
-                {skills.map((s) => (
-                  <span 
-                    key={s} 
-                    className="px-4 py-2 rounded-xl bg-white dark:bg-blue-600/5 border border-zinc-200 dark:border-blue-400/20 text-zinc-500 dark:text-blue-300 text-[10px] font-bold uppercase tracking-tight shadow-sm"
-                  >
-                    {s}
-                  </span>
-                ))}
-              </div>
-            </div>
+          <div className="flex flex-wrap gap-2 pt-4">
+            {step.skills.map((s) => (
+              <span key={s} className="px-3 py-1.5 rounded-lg bg-zinc-100 dark:bg-white/5 text-zinc-500 dark:text-blue-200 text-[8px] font-black uppercase tracking-widest border border-zinc-200/50 dark:border-white/10">
+                {s}
+              </span>
+            ))}
           </div>
         </div>
-      </motion.div>
-    </div>
+      </div>
+    </motion.div>
   );
 }
