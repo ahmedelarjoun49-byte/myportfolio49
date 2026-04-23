@@ -14,7 +14,6 @@ import MyStory from "@/components/MyStory_temp";
 import GraduationScrollVideo from "@/components/GraduationScrollVideo";
 
 const PROFILE_SRC = "/mypicture.png";
-const HERO_BG_VIDEO_SRC = "/stars.mp4";
 
 const CustomCursor = () => {
   const cursorRef = useRef<HTMLDivElement>(null);
@@ -99,12 +98,15 @@ export default function HomeClient() {
       <div className="dark text-white">
         <section id="home" className="relative min-h-screen flex items-center justify-center overflow-hidden">
           
-          {/* ATMOSPHERIC BACKGROUND */}
-          <div className="absolute inset-0 z-0">
-            <video autoPlay muted loop playsInline className="absolute inset-0 h-full w-full object-cover opacity-30" src={HERO_BG_VIDEO_SRC} />
-            <div className="absolute inset-0 bg-black/40 backdrop-blur-[1px]" />
-            <div className="absolute top-[-10%] left-[-10%] w-[60%] h-[60%] bg-blue-900/20 blur-[150px] rounded-full" />
-            <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-indigo-900/10 blur-[130px] rounded-full" />
+          {/* REFINED ATMOSPHERIC BACKGROUND (VIDEO REMOVED) */}
+          <div className="absolute inset-0 z-0 bg-[#020202]">
+            {/* Grain Overlay for Texture */}
+            <div className="absolute inset-0 opacity-[0.03] bg-[url('https://grainy-gradients.vercel.app/noise.svg')] pointer-events-none" />
+            
+            {/* Royal Blue & Indigo Ambient Glows */}
+            <div className="absolute top-[-10%] left-[-10%] w-[70%] h-[70%] bg-blue-900/20 blur-[150px] rounded-full animate-pulse-slow" />
+            <div className="absolute bottom-[-10%] right-[-10%] w-[60%] h-[60%] bg-indigo-900/15 blur-[130px] rounded-full" />
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[40%] h-[40%] bg-blue-600/5 blur-[120px] rounded-full" />
           </div>
 
           <main className="relative z-20 container mx-auto px-6 md:px-12 max-w-7xl">
@@ -124,7 +126,7 @@ export default function HomeClient() {
 
                   <div className="relative overflow-visible px-2">
                     <h1 className="text-6xl md:text-7xl lg:text-8xl font-black leading-tight tracking-tighter text-white overflow-visible">
-                      <span className="inline-block text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-indigo-400 to-blue-600 drop-shadow-[0_0_35px_rgba(37,99,235,0.4)] pr-2 animate-pulse-slow">
+                      <span className="inline-block text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-indigo-400 to-blue-600 drop-shadow-[0_0_35px_rgba(37,99,235,0.4)] pr-2">
                         Web
                       </span>
                       <div className="min-h-[1.1em] overflow-visible pb-2 pt-1 leading-snug">
@@ -211,6 +213,17 @@ export default function HomeClient() {
         <Skils />
         <MyStory />
       </div>
+
+      {/* Adding a global pulse animation for the background glows */}
+      <style jsx global>{`
+        @keyframes pulse-slow {
+          0%, 100% { opacity: 0.2; transform: scale(1); }
+          50% { opacity: 0.3; transform: scale(1.05); }
+        }
+        .animate-pulse-slow {
+          animation: pulse-slow 8s infinite ease-in-out;
+        }
+      `}</style>
     </div>
   );
 }
