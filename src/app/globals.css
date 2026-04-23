@@ -13,7 +13,8 @@
    Keep it subtle + safe
 ====================================================== */
 html {
-  zoom: 1.02;
+  zoom: 1.00
+  ;
 }
 
 /* Smooth theme transition */
