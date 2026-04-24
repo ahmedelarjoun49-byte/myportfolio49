@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect, useRef } from "react";
-import { motion, type Variants } from "framer-motion";
+import { useEffect, useRef, useState, useCallback } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
-import { Download, Code2, Cpu, Palette, Box, ArrowUpRight } from "lucide-react"; 
+import { Download, ArrowUpRight, X, Github, Linkedin, Instagram, MessageCircle } from "lucide-react";
 import { Typewriter } from "react-simple-typewriter";
 import gsap from "gsap";
 
@@ -14,6 +14,33 @@ import MyStory from "@/components/MyStory_temp";
 import GraduationScrollVideo from "@/components/GraduationScrollVideo";
 
 const PROFILE_SRC = "/mypicture.png";
+
+const SOCIALS = [
+  { 
+    Icon: Github, 
+    href: "https://github.com/ahmedelarjoun49-byte", 
+    label: "GitHub",
+    color: "hover:text-[#fafafa] hover:bg-white/10"
+  },
+  { 
+    Icon: Linkedin, 
+    href: "https://www.linkedin.com/in/ahmed-el-arjoun-639804305/", 
+    label: "LinkedIn",
+    color: "hover:text-[#0077b5] hover:bg-[#0077b5]/10"
+  },
+  { 
+    Icon: Instagram, 
+    href: "https://www.instagram.com/el4rjoun/", 
+    label: "Instagram",
+    color: "hover:text-[#e4405f] hover:bg-[#e4405f]/10"
+  },
+  { 
+    Icon: MessageCircle, 
+    href: "https://wa.me/212691243592", 
+    label: "WhatsApp",
+    color: "hover:text-[#25d366] hover:bg-[#25d366]/10"
+  },
+];
 
 const CustomCursor = () => {
   const cursorRef = useRef<HTMLDivElement>(null);
@@ -47,46 +74,22 @@ const CustomCursor = () => {
   );
 };
 
-// --- ENHANCED ENTRANCE ANIMATIONS ---
-const containerVariants: Variants = {
-  hidden: { opacity: 0 },
-  show: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.15,
-      delayChildren: 0.4,
-    },
-  },
-};
-
-const itemVariants: Variants = {
-  hidden: { opacity: 0, y: 40, filter: "blur(10px)" },
-  show: { 
-    opacity: 1, 
-    y: 0, 
-    filter: "blur(0px)",
-    transition: { duration: 1, ease: [0.25, 1, 0.5, 1] } 
-  },
-};
-
-const photoVariants: Variants = {
-  hidden: { opacity: 0, scale: 0.8, x: 50, filter: "blur(20px)" },
-  show: { 
-    opacity: 1, 
-    scale: 1, 
-    x: 0, 
-    filter: "blur(0px)",
-    transition: { duration: 1.5, ease: [0.16, 1, 0.3, 1], delay: 0.8 } 
-  },
-};
-
 export default function HomeClient() {
-  const stackIcons = [
-    { icon: <Code2 size={22} />, label: "React" },
-    { icon: <Cpu size={22} />, label: "TypeScript" },
-    { icon: <Palette size={22} />, label: "Tailwind" },
-    { icon: <Box size={22} />, label: "3D" },
-  ];
+  const [showCV, setShowCV] = useState(false);
+  const [showSocials, setShowSocials] = useState(false);
+
+  const closeModals = useCallback(() => {
+    setShowCV(false);
+    setShowSocials(false);
+  }, []);
+
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") closeModals();
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [closeModals]);
 
   return (
     <div className="transition-colors duration-300 selection:bg-blue-500/30 lg:cursor-none bg-black min-h-screen">
@@ -96,40 +99,34 @@ export default function HomeClient() {
       </div>
 
       <div className="dark text-white">
-        <section id="home" className="relative min-h-screen flex items-center justify-center overflow-hidden">
+        <section id="home" className="relative min-h-screen flex items-stretch justify-center overflow-hidden bg-black">
           
-          {/* REFINED ATMOSPHERIC BACKGROUND (VIDEO REMOVED) */}
           <div className="absolute inset-0 z-0 bg-[#020202]">
-            {/* Grain Overlay for Texture */}
             <div className="absolute inset-0 opacity-[0.03] bg-[url('https://grainy-gradients.vercel.app/noise.svg')] pointer-events-none" />
-            
-            {/* Royal Blue & Indigo Ambient Glows */}
             <div className="absolute top-[-10%] left-[-10%] w-[70%] h-[70%] bg-blue-900/20 blur-[150px] rounded-full animate-pulse-slow" />
             <div className="absolute bottom-[-10%] right-[-10%] w-[60%] h-[60%] bg-indigo-900/15 blur-[130px] rounded-full" />
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[40%] h-[40%] bg-blue-600/5 blur-[120px] rounded-full" />
           </div>
 
-          <main className="relative z-20 container mx-auto px-6 md:px-12 max-w-7xl">
+          <main className="relative z-20 container mx-auto px-6 md:px-12 max-w-7xl flex items-center">
             <motion.div
               initial="hidden"
               animate="show"
-              variants={containerVariants}
-              className="flex flex-col lg:flex-row items-center justify-between gap-12"
+              variants={{ hidden: { opacity: 0 }, show: { opacity: 1, transition: { staggerChildren: 0.1 } } }}
+              className="flex flex-col lg:flex-row items-center justify-between gap-12 w-full min-h-screen"
             >
-              <div className="w-full lg:w-[60%] space-y-8 text-center lg:text-left">
-                
-                {/* INTRO TEXT */}
-                <motion.div variants={itemVariants} className="space-y-2">
+              {/* Text Side */}
+              <div className="w-full lg:w-[55%] space-y-8 text-center lg:text-left py-20 z-40">
+                <motion.div variants={{ hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0 } }} className="space-y-2">
                   <h2 className="text-lg md:text-xl text-white/60 font-light tracking-wide">
                     Hey, I&apos;m <span className="text-white font-medium">Ahmed El Arjoun</span>
                   </h2>
 
-                  <div className="relative overflow-visible px-2">
-                    <h1 className="text-6xl md:text-7xl lg:text-8xl font-black leading-tight tracking-tighter text-white overflow-visible">
+                  <div className="relative overflow-visible">
+                    <h1 className="text-6xl md:text-7xl lg:text-8xl font-black leading-tight tracking-tighter text-white">
                       <span className="inline-block text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-indigo-400 to-blue-600 drop-shadow-[0_0_35px_rgba(37,99,235,0.4)] pr-2">
                         Web
                       </span>
-                      <div className="min-h-[1.1em] overflow-visible pb-2 pt-1 leading-snug">
+                      <div className="min-h-[1.1em] leading-snug">
                         <Typewriter
                           words={["Junior Dev", "Multimedia Developer"]}
                           loop={0}
@@ -141,61 +138,39 @@ export default function HomeClient() {
                         />
                       </div>
                     </h1>
-                    <motion.div 
-                      variants={itemVariants}
-                      className="text-xl md:text-2xl font-bold tracking-[0.3em] uppercase opacity-40 mt-2 text-blue-100"
-                    >
+                    <div className="text-xl md:text-2xl font-bold tracking-[0.3em] uppercase opacity-40 mt-2 text-blue-100">
                       & Multimedia 3D
-                    </motion.div>
+                    </div>
                   </div>
                 </motion.div>
 
-                {/* DESCRIPTION */}
-                <motion.p variants={itemVariants} className="text-base md:text-lg text-white/50 max-w-xl mx-auto lg:mx-0 leading-relaxed">
+                <motion.p variants={{ hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0 } }} className="text-base md:text-lg text-white/50 max-w-xl mx-auto lg:mx-0 leading-relaxed">
                   A versatile <span className="text-white/80 font-medium">Full-Stack Junior Developer</span> and <span className="text-white/80 font-medium">IoT student</span>, blending technical engineering with creative <span className="text-blue-400">Multimedia 3D</span> expertise.
                 </motion.p>
 
-                {/* TECH STACK STAGGERED REVEAL */}
-                <motion.div variants={itemVariants} className="flex flex-wrap gap-4 justify-center lg:justify-start">
-                  {stackIcons.map((item, idx) => (
-                    <motion.div 
-                      key={idx} 
-                      whileHover={{ scale: 1.1, rotate: 5 }}
-                      className="interactive flex items-center justify-center w-14 h-14 rounded-2xl bg-white/5 border border-white/10 text-white/30 hover:text-blue-400 hover:border-blue-500/50 hover:bg-blue-500/5 transition-all duration-500"
-                    >
-                      {item.icon}
-                    </motion.div>
-                  ))}
-                </motion.div>
-
-                {/* BUTTONS */}
-                <motion.div variants={itemVariants} className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start pt-4">
-                  <Link href="/contact" className="px-10 py-4 rounded-xl bg-blue-600 text-white font-bold transition-all hover:scale-105 hover:bg-blue-500 shadow-lg shadow-blue-900/40 text-[10px] uppercase tracking-widest flex items-center gap-2 group">
-                    Get In Touch <ArrowUpRight size={14} className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
-                  </Link>
-                  <Link href="/cv1.pdf" className="px-10 py-4 rounded-xl border border-white/10 bg-white/5 backdrop-blur-xl text-white font-semibold flex items-center gap-2 hover:bg-white/10 transition-all text-[10px] uppercase tracking-widest">
-                    <Download size={14} /> Download CV
-                  </Link>
+                <motion.div variants={{ hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0 } }} className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start pt-4">
+                  <button onClick={() => setShowSocials(true)} className="px-10 py-4 rounded-full bg-blue-600 text-white font-bold transition-all hover:bg-blue-500 shadow-[0_0_30px_rgba(37,99,235,0.2)] text-[10px] uppercase tracking-widest flex items-center gap-2">
+                    Get In Touch <ArrowUpRight size={14} />
+                  </button>
+                  <button onClick={() => setShowCV(true)} className="px-10 py-4 rounded-full border border-white/10 bg-white/5 backdrop-blur-xl text-white font-semibold flex items-center gap-2 hover:bg-white/10 transition-all text-[10px] uppercase tracking-widest">
+                    <Download size={14} /> View CV
+                  </button>
                 </motion.div>
               </div>
 
-              {/* DYNAMIC PORTRAIT REVEAL */}
+              {/* FIXED IMAGE CONTAINER */}
               <motion.div
-                variants={photoVariants}
-                className="relative w-full lg:w-[45%] flex justify-center lg:justify-end items-end h-[50vh] lg:h-[80vh]"
+                initial={{ opacity: 0, x: 50 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 1.2, ease: "easeOut" }}
+                className="relative w-full lg:w-[50%] h-full flex items-end justify-center lg:justify-end overflow-visible"
               >
-                <div className="absolute inset-0 w-full h-full bg-blue-600/10 rounded-full blur-[120px] pointer-events-none opacity-40 animate-pulse" />
-                
-                <div className="relative z-20 w-full h-full flex justify-center lg:justify-end items-end overflow-visible">
-                  <motion.img
-                    src={PROFILE_SRC}
-                    alt="Ahmed Portrait"
-                    initial={{ filter: "brightness(0.5) blur(10px)" }}
-                    animate={{ filter: "brightness(1.1) blur(0px)" }}
-                    transition={{ duration: 2, ease: "easeOut" }}
-                    className="w-auto h-full object-contain filter drop-shadow-[0_0_45px_rgba(30,58,138,0.7)]"
+                <div className="relative w-full h-full flex items-end overflow-visible profile-mask">
+                  <img 
+                    src={PROFILE_SRC} 
+                    alt="Ahmed Graduation" 
+                    className="w-auto h-[90vh] object-contain filter drop-shadow-[0_0_80px_rgba(30,58,138,0.2)] z-10 select-none" 
                   />
-                  <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-black via-black/40 to-transparent pointer-events-none" />
                 </div>
               </motion.div>
 
@@ -204,25 +179,76 @@ export default function HomeClient() {
         </section>
       </div>
 
-      <div className="relative z-30">
+      {/* Modals & Remaining Sections */}
+      <AnimatePresence>
+        {showSocials && (
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[250] flex items-center justify-center p-6 bg-black/40 backdrop-blur-[30px]" onClick={closeModals}>
+            <motion.div initial={{ scale: 0.9, opacity: 0, y: 20 }} animate={{ scale: 1, opacity: 1, y: 0 }} exit={{ scale: 0.9, opacity: 0, y: 20 }} className="grid grid-cols-2 md:grid-cols-4 gap-4 w-full max-w-2xl" onClick={(e) => e.stopPropagation()}>
+              {SOCIALS.map((social, idx) => (
+                <Link key={idx} href={social.href} target="_blank" className={`group aspect-square flex flex-col items-center justify-center bg-white/5 border border-white/5 rounded-[2rem] transition-all duration-500 hover:scale-[1.05] hover:border-white/20 ${social.color}`}>
+                  <social.Icon size={40} strokeWidth={1.5} className="transition-all duration-500 group-hover:scale-110" />
+                  <span className="mt-4 text-[9px] uppercase tracking-[0.3em] font-bold opacity-40 group-hover:opacity-100 transition-opacity">{social.label}</span>
+                </Link>
+              ))}
+              <button onClick={closeModals} className="col-span-2 md:col-span-4 mt-6 text-[10px] uppercase tracking-[0.5em] text-white/20 hover:text-white transition-all">
+                [ Click anywhere to close ]
+              </button>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {showCV && (
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/95 backdrop-blur-md" onClick={closeModals}>
+            <motion.div initial={{ scale: 0.9, y: 20 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.9, y: 20 }} className="relative w-full max-w-5xl h-[85vh] bg-[#111] rounded-2xl border border-white/10 overflow-hidden shadow-2xl" onClick={(e) => e.stopPropagation()}>
+              <div className="flex items-center justify-end p-4 border-b border-white/10 bg-black/50">
+                <button onClick={closeModals} className="p-2 hover:bg-white/5 rounded-full transition-colors text-white/50 hover:text-white">
+                  <X size={20} />
+                </button>
+              </div>
+              <iframe src="/cv1.pdf" className="w-full h-full" title="Ahmed CV" />
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <div className="relative z-30 bg-black">
         <GraduationScrollVideo />
-        <div id="experience" className="py-20">
-          <Experience />
-        </div>
+        <div id="experience" className="py-20"><Experience /></div>
         <ProjectBanner />
         <Skils />
         <MyStory />
       </div>
 
-      {/* Adding a global pulse animation for the background glows */}
       <style jsx global>{`
-        @keyframes pulse-slow {
-          0%, 100% { opacity: 0.2; transform: scale(1); }
-          50% { opacity: 0.3; transform: scale(1.05); }
+        @keyframes pulse-slow { 
+          0%, 100% { opacity: 0.2; } 
+          50% { opacity: 0.35; } 
         }
-        .animate-pulse-slow {
-          animation: pulse-slow 8s infinite ease-in-out;
+        .animate-pulse-slow { animation: pulse-slow 8s infinite ease-in-out; }
+        
+        /* THE FIX: Professional Masking */
+        .profile-mask {
+          mask-image: linear-gradient(to bottom, 
+            black 0%, 
+            black 75%, 
+            rgba(0,0,0,0.5) 85%, 
+            transparent 100%
+          );
+          -webkit-mask-image: linear-gradient(to bottom, 
+            black 0%, 
+            black 75%, 
+            rgba(0,0,0,0.5) 85%, 
+            transparent 100%
+          );
         }
+
+        /* Ensure no horizontal scrolling or container clipping */
+        #home main { overflow: visible; }
+        
+        *:focus { outline: none !important; }
+        button, a { -webkit-tap-highlight-color: transparent; }
       `}</style>
     </div>
   );
