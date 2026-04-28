@@ -1,202 +1,180 @@
 "use client";
 
-import React, { useState } from "react";
-import {
-  motion,
-  useMotionValue,
-} from "framer-motion";
+import React from "react";
+import { motion } from "framer-motion";
+
+/** * Note: Add these to your layout.tsx or global CSS:
+ * <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;1,500&family=Montserrat:wght@300;400;500&family=JetBrains+Mono:ital@0;1&display=swap" rel="stylesheet">
+ */
 
 type ProcessStep = {
-  year: string;
-  phase: string;
-  focus: string;
-  milestones: string[];
-  skills: string[];
+  period: string;
+  story: string;
+  details: string[];
+  techStack: string[];
 };
 
-const LICENCE_PROCESS: ProcessStep[] = [
+const MY_JOURNEY: ProcessStep[] = [
   {
-    year: "Year 01",
-    phase: "The Foundation",
-    focus: "Web Architecture",
-    milestones: [
+    period: "Year 01",
+    story: "Deep-diving into the fundamental architecture of the web, moving from a curious observer to a creator.",
+    details: [
       "Mastered the core pillars: HTML structure and CSS artistry.",
       "Developed logic-driven designs to bridge the gap from static to fluid.",
-      "First steps into algorithms and computational thinking.",
+      "First steps into algorithms and computational thinking."
     ],
-    skills: ["HTML5", "CSS3", "JavaScript", "Algorithms"],
+    techStack: ["HTML5", "CSS3", "JavaScript", "Algorithms"],
   },
   {
-    year: "Year 02",
-    phase: "The Backend Shift",
-    focus: "Systems & Logic",
-    milestones: [
+    period: "Year 02",
+    story: "Focusing heavily on PHP and the Laravel ecosystem to build robust backends.",
+    details: [
       "Advanced into software engineering with C# and .NET frameworks.",
       "Architected a robust 'Car Rental' ecosystem for my PFS project.",
-      "Deepened back-end fluency with PHP and Laravel ecosystems.",
+      "Deepened back-end fluency with PHP and Laravel ecosystems."
     ],
-    skills: ["C# / .NET", "Laravel", "PHP", "MySQL"],
+    techStack: ["PHP", "Laravel", "C# / .NET", "MySQL"],
   },
   {
-    year: "Year 03",
-    phase: "Multimedia Mastery",
-    focus: "3D Creative Web",
-    milestones: [
-      "Merged engineering with visual art via Multimedia specialization.",
+    period: "Year 03",
+    story: "Merging technical engineering with high-fidelity visual art.",
+    details: [
       "Integrated high-fidelity 3D models into browser logic.",
       "Engineered high-end interfaces with Three.js and Next.js.",
+      "Merged engineering with visual art via Multimedia specialization."
     ],
-    skills: ["Three.js", "R3F", "3D Modeling", "Next.js"],
+    techStack: ["Three.js", "R3F", "Next.js", "3D Modeling"],
   },
 ];
 
-const SWIPE_THRESHOLD = 50;
-
-export default function LicenceLineage() {
-  const [cardIndex, setCardIndex] = useState(0);
-  const dragX = useMotionValue(0);
-
-  // Improved tactile swipe logic for phones
-  const onDragEnd = (_: any, info: any) => {
-    const projectedDistance = info.offset.x;
-
-    if (projectedDistance < -SWIPE_THRESHOLD && cardIndex < LICENCE_PROCESS.length - 1) {
-      setCardIndex((pv) => pv + 1);
-    } else if (projectedDistance > SWIPE_THRESHOLD && cardIndex > 0) {
-      setCardIndex((pv) => pv - 1);
-    }
-  };
-
+export default function ConnectedLineage() {
   return (
-    <section className="relative h-screen w-full bg-white dark:bg-[#020617] flex flex-col items-center justify-center overflow-hidden transition-colors duration-500">
+    <section className="relative min-h-screen w-full bg-[#050505] flex flex-col items-center justify-center py-24 overflow-hidden">
       
-      <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full bg-[radial-gradient(circle_at_center,_rgba(37,99,235,0.03)_0%,_transparent_70%)] dark:bg-[radial-gradient(circle_at_center,_rgba(37,99,235,0.08)_0%,_transparent_60%)]" />
-        <div className="absolute inset-0 opacity-[0.15] dark:opacity-[0.05] mix-blend-overlay bg-[url('https://grainy-gradients.vercel.app/noise.svg')]" />
+      {/* Background Video Layer */}
+      <div className="absolute inset-0 z-0">
+        <video
+          autoPlay loop muted playsInline
+          className="w-full h-full object-cover opacity-60 grayscale-0 brightness-75 blur-0"
+        >
+          <source src="/CODINGVID.mp4" type="video/mp4" />
+        </video>
+        <div className="absolute inset-0 bg-gradient-to-b from-[#050505]/80 via-transparent to-[#050505]/80" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_20%,#050505_100%)]" />
       </div>
 
-      <header className="absolute top-12 md:top-16 text-center z-20 space-y-3 px-4">
-        <h2 className="text-5xl md:text-8xl font-black text-zinc-900 dark:text-white tracking-tighter uppercase leading-none">
-          Lineage<span className="text-blue-600">.</span>
+      <header className="relative mb-24 text-center z-40">
+        <h2 
+          style={{ fontFamily: "'Cormorant Garamond', serif" }}
+          className="text-6xl md:text-8xl text-white font-light tracking-tight"
+        >
+          Academic Lineage<span className="text-[#4169E1]">.</span>
         </h2>
-        <div className="flex items-center justify-center gap-4">
-          <div className="h-[1px] w-8 md:w-12 bg-blue-600/20" />
-          <p className="text-blue-600 dark:text-blue-400 font-mono text-[9px] md:text-[10px] tracking-[0.5em] uppercase font-black">
-            The Path To Mastery
-          </p>
-          <div className="h-[1px] w-8 md:w-12 bg-blue-600/20" />
-        </div>
+        <div className="w-32 h-px bg-[#4169E1] mx-auto mt-6 opacity-60" />
       </header>
 
-      {/* touch-none is critical for mobile horizontal swiping */}
-      <div className="relative w-full max-w-7xl px-4 flex items-center justify-center touch-none">
-        <motion.div
-          drag="x"
-          dragConstraints={{ left: 0, right: 0 }}
-          style={{ x: dragX }}
-          animate={{ x: 0 }}
-          onDragEnd={onDragEnd}
-          className="flex gap-6 md:gap-12 items-center cursor-grab active:cursor-grabbing"
-        >
-          {LICENCE_PROCESS.map((step, i) => (
-            <LineageCard 
-              key={i} 
-              step={step} 
-              index={i} 
-              activeCard={cardIndex} 
-              onClick={() => setCardIndex(i)}
-            />
-          ))}
-        </motion.div>
-      </div>
-
-      <div className="absolute bottom-16 flex items-center gap-8 z-20">
-        <div className="flex gap-2.5">
-          {LICENCE_PROCESS.map((_, i) => (
-            <motion.button
-              key={i}
-              onClick={() => setCardIndex(i)}
-              animate={{ 
-                width: cardIndex === i ? 48 : 12,
-                backgroundColor: cardIndex === i ? "#2563eb" : "rgba(100,100,100,0.3)"
-              }}
-              className="h-1.5 rounded-full transition-all duration-300"
-            />
+      {/* Lined Layout Container */}
+      <div className="relative z-30 w-full max-w-[1400px] px-8">
+        <div className="flex flex-col lg:flex-row items-center lg:items-stretch justify-center gap-8 lg:gap-6">
+          {MY_JOURNEY.map((step, i) => (
+            <StoryCard key={i} step={step} index={i} />
           ))}
         </div>
       </div>
+
+      {/* Decorative Connecting Line */}
+      <div className="absolute top-[60%] left-0 w-full h-px bg-gradient-to-r from-transparent via-[#4169E1]/20 to-transparent -translate-y-1/2 z-10 hidden lg:block" />
     </section>
   );
 }
 
-function LineageCard({ step, index, activeCard, onClick }: { step: ProcessStep; index: number; activeCard: number; onClick: () => void }) {
-  const isVisible = index === activeCard;
-  const offset = index - activeCard;
-
+function StoryCard({ step, index }: { step: ProcessStep; index: number }) {
   return (
     <motion.div
-      onClick={onClick}
-      animate={{
-        // restored the original layout values but kept them slightly tighter for mobile
-        scale: isVisible ? 1 : 0.85, 
-        x: `${offset * 5}%`,
-        opacity: isVisible ? 1 : 0.5,
-        rotateY: offset * 12,
-        filter: isVisible ? "blur(0px)" : "blur(2px)",
-        zIndex: isVisible ? 10 : 5 - Math.abs(offset),
-      }}
-      whileHover={{ 
-        scale: isVisible ? 1.02 : 0.88,
-        opacity: 1,
-        filter: "blur(0px)",
-      }}
-      transition={{ type: "spring", stiffness: 200, damping: 25 }}
-      // Adjusted width for mobile (85vw) vs desktop (500px)
-      className={`relative w-[85vw] md:w-[500px] shrink-0 transition-all ${isVisible ? 'cursor-default' : 'cursor-pointer select-none'}`}
+      initial={{ opacity: 0, y: 40 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ delay: index * 0.15, duration: 0.8, ease: "easeOut" }}
+      whileHover={{ y: -15 }}
+      className="relative w-full lg:w-1/3 flex flex-col"
     >
-      <div className="relative bg-white/70 dark:bg-zinc-950/60 backdrop-blur-2xl rounded-[2rem] md:rounded-[2.5rem] border border-zinc-200/50 dark:border-white/10 p-8 md:p-14 overflow-hidden shadow-2xl">
+      <div className="h-full bg-[#0d0d0d]/95 backdrop-blur-3xl border border-white/10 hover:border-[#4169E1]/50 rounded-2xl overflow-hidden transition-all duration-500 shadow-2xl flex flex-col">
         
-        <div className="absolute -bottom-20 -left-20 w-80 h-80 bg-blue-600/5 dark:bg-blue-500/10 blur-[100px] rounded-full pointer-events-none" />
+        {/* Mac-style Top Bar */}
+        <div className="bg-[#1a1a1a] px-5 py-4 border-b border-white/5 flex items-center justify-between">
+          <div className="flex gap-2.5">
+            <div className="w-3 h-3 rounded-full bg-[#FF5F56] shadow-inner" />
+            <div className="w-3 h-3 rounded-full bg-[#FFBD2E] shadow-inner" />
+            <div className="w-3 h-3 rounded-full bg-[#27C93F] shadow-inner" />
+          </div>
+          <span 
+            style={{ fontFamily: "'JetBrains Mono', monospace" }} 
+            className="text-[9px] uppercase tracking-[0.2em] text-zinc-500 font-bold"
+          >
+            Terminal.log_{index + 1}
+          </span>
+        </div>
 
-        <div className="relative z-10 space-y-6 md:space-y-8 pointer-events-none">
-          <header className="space-y-3">
-            <div className="flex items-center gap-3">
-               <span className="px-2 py-1 bg-blue-600 text-white text-[8px] font-black uppercase rounded-md tracking-tighter">
-                {step.year}
-              </span>
-              <span className="text-zinc-400 dark:text-zinc-500 font-mono text-[9px] font-bold uppercase tracking-[0.2em]">
-                {step.phase}
-              </span>
-            </div>
-            
-            <h3 className="text-2xl md:text-5xl font-black text-zinc-900 dark:text-white leading-[0.9] tracking-tighter uppercase">
-              {step.focus.split(' ')[0]} <br/>
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-blue-400">
-                {step.focus.split(' ').slice(1).join(' ')}
-              </span>
+        {/* Content Area */}
+        <div className="p-8 lg:p-10 space-y-8 flex-grow flex flex-col">
+          <div className="relative inline-block">
+            <h3 
+              style={{ 
+                fontFamily: "'Cormorant Garamond', serif",
+                color: "#4169E1"
+              }}
+              className="text-6xl font-medium italic leading-none mb-2"
+            >
+              {step.period}
             </h3>
-          </header>
+            {/* Underline Element */}
+            <div className="w-24 h-[2px] bg-[#4169E1]/40 mb-6" />
+            
+            <p 
+              style={{ fontFamily: "'Montserrat', sans-serif" }} 
+              className="text-[15px] leading-relaxed text-zinc-100 font-normal"
+            >
+              <span style={{ fontFamily: "'JetBrains Mono', monospace" }} className="text-[#4169E1] font-bold text-xs mr-2">let</span> 
+              narrative = <span className="text-orange-200/90 italic">"{step.story}"</span>;
+            </p>
+          </div>
 
-          <ul className="space-y-4">
-            {step.milestones.map((m, idx) => (
-              <li key={idx} className="flex gap-4 items-start">
-                <div className="w-1.5 h-1.5 rounded-full bg-blue-600 mt-1.5 shrink-0 shadow-[0_0_8px_rgba(37,99,235,0.4)]" />
-                <p className="text-zinc-600 dark:text-zinc-400 text-[11px] md:text-sm font-medium leading-relaxed tracking-tight">
-                  {m}
+          <div className="space-y-4 border-l-2 border-[#4169E1]/20 pl-6">
+            {step.details.map((detail, idx) => (
+              <div key={idx} className="flex gap-4 items-start group">
+                <span 
+                  style={{ fontFamily: "'JetBrains Mono', monospace" }} 
+                  className="text-[12px] text-[#4169E1]/60 mt-1 transition-colors group-hover:text-[#4169E1]"
+                >
+                  //
+                </span>
+                <p 
+                  style={{ fontFamily: "'Montserrat', sans-serif" }} 
+                  className="text-[14px] leading-snug tracking-wide text-zinc-300 group-hover:text-white transition-colors duration-300"
+                >
+                  {detail}
                 </p>
-              </li>
+              </div>
             ))}
-          </ul>
+          </div>
 
-          <div className="flex flex-wrap gap-2 pt-4">
-            {step.skills.map((s) => (
-              <span key={s} className="px-2.5 py-1 md:px-3 md:py-1.5 rounded-lg bg-zinc-100 dark:bg-white/5 text-zinc-500 dark:text-blue-200 text-[7px] md:text-[8px] font-black uppercase tracking-widest border border-zinc-200/50 dark:border-white/10">
-                {s}
+          {/* Tech Stack Pills */}
+          <div className="pt-6 flex flex-wrap gap-2 mt-auto">
+            {step.techStack.map((tech) => (
+              <span 
+                key={tech} 
+                style={{ fontFamily: "'JetBrains Mono', monospace" }}
+                className="text-[10px] px-3 py-1.5 rounded-md border border-white/10 text-zinc-200 bg-white/5 hover:bg-[#4169E1]/10 hover:border-[#4169E1]/40 transition-all"
+              >
+                {tech}
               </span>
             ))}
           </div>
         </div>
       </div>
+
+      {/* Subtle Glow Effect */}
+      <div className="absolute -inset-1 bg-[#4169E1]/10 blur-2xl -z-10 rounded-3xl opacity-0 hover:opacity-100 transition-opacity duration-500" />
     </motion.div>
   );
 }
