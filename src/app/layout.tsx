@@ -1,6 +1,6 @@
 import "./globals.css";
 import type { ReactNode } from "react";
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import ScrollReset from "@/components/ScrollReset";
 import Providers from "./providers";
 import { Playwrite_NZ } from "next/font/google";
@@ -11,6 +11,11 @@ const playwrite = Playwrite_NZ({
   variable: "--font-playwrite",
   display: "swap",
 });
+
+// Next.js 15 viewport configuration
+export const viewport: Viewport = {
+  themeColor: "#06140f",
+};
 
 export const metadata: Metadata = {
   title: "Ahmed El Arjoun | Web Developer & Multimedia 3D",
@@ -28,7 +33,6 @@ export const metadata: Metadata = {
     "Multimedia 3D",
   ],
   robots: { index: true, follow: true },
-  themeColor: "#06140f",
   openGraph: {
     title: "Ahmed El Arjoun | Web Developer & Multimedia 3D",
     description:

@@ -117,6 +117,7 @@ export default function HomeClient() {
               {/* Text Side */}
               <div className="w-full lg:w-[55%] space-y-8 text-center lg:text-left py-20 z-40">
                 <motion.div variants={{ hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0 } }} className="space-y-2">
+                  
                   <h2 className="text-lg md:text-xl text-white/60 font-light tracking-wide">
                     Hey, I&apos;m <span className="text-white font-medium">Ahmed El Arjoun</span>
                   </h2>
@@ -138,8 +139,11 @@ export default function HomeClient() {
                         />
                       </div>
                     </h1>
-                    <div className="text-xl md:text-2xl font-bold tracking-[0.3em] uppercase opacity-40 mt-2 text-blue-100">
-                      & Multimedia 3D
+                    <div 
+                      style={{ fontFamily: "'Imperial Script', cursive" }}
+                      className="text-4xl md:text-5xl tracking-normal normal-case opacity-90 mt-1 text-blue-400 lowercase drop-shadow-[0_0_20px_rgba(65,105,225,0.4)]"
+                    >
+                      & multimedia 3d
                     </div>
                   </div>
                 </motion.div>
@@ -149,12 +153,23 @@ export default function HomeClient() {
                 </motion.p>
 
                 <motion.div variants={{ hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0 } }} className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start pt-4">
-                  <button onClick={() => setShowSocials(true)} className="px-10 py-4 rounded-full bg-blue-600 text-white font-bold transition-all hover:bg-blue-500 shadow-[0_0_30px_rgba(37,99,235,0.2)] text-[10px] uppercase tracking-widest flex items-center gap-2">
-                    Get In Touch <ArrowUpRight size={14} />
+                  
+                  <button 
+                    onClick={() => setShowSocials(true)} 
+                    className="group relative px-9 py-4 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-extrabold tracking-wider text-[12px] uppercase shadow-[0_0_25px_rgba(37,99,235,0.3)] hover:shadow-[0_0_40px_rgba(65,105,225,0.6)] flex items-center justify-center gap-2 transition-all duration-300 hover:scale-[1.03] active:scale-[0.98]"
+                  >
+                    Get In Touch 
+                    <ArrowUpRight size={15} className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform duration-300" />
                   </button>
-                  <button onClick={() => setShowCV(true)} className="px-10 py-4 rounded-full border border-white/10 bg-white/5 backdrop-blur-xl text-white font-semibold flex items-center gap-2 hover:bg-white/10 transition-all text-[10px] uppercase tracking-widest">
-                    <Download size={14} /> View CV
+
+                  <button 
+                    onClick={() => setShowCV(true)} 
+                    className="group px-9 py-4 rounded-xl border border-white/10 bg-white/[0.03] backdrop-blur-md text-zinc-300 font-bold tracking-wider text-[12px] uppercase flex items-center justify-center gap-2 hover:bg-white/10 hover:border-white/20 hover:text-white transition-all duration-300 active:scale-[0.98]"
+                  >
+                    <Download size={15} className="group-hover:translate-y-0.5 transition-transform duration-300" /> 
+                    View CV
                   </button>
+
                 </motion.div>
               </div>
 
@@ -222,13 +237,14 @@ export default function HomeClient() {
       </div>
 
       <style jsx global>{`
+        @import url('https://fonts.googleapis.com/css2?family=Imperial+Script&display=swap');
+
         @keyframes pulse-slow { 
           0%, 100% { opacity: 0.2; } 
           50% { opacity: 0.35; } 
         }
         .animate-pulse-slow { animation: pulse-slow 8s infinite ease-in-out; }
         
-        /* THE FIX: Professional Masking */
         .profile-mask {
           mask-image: linear-gradient(to bottom, 
             black 0%, 
@@ -244,7 +260,6 @@ export default function HomeClient() {
           );
         }
 
-        /* Ensure no horizontal scrolling or container clipping */
         #home main { overflow: visible; }
         
         *:focus { outline: none !important; }

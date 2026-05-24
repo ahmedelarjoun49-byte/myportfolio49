@@ -101,18 +101,12 @@ function StoryCard({ step, index }: { step: ProcessStep; index: number }) {
       <div className="h-full bg-[#0d0d0d]/95 backdrop-blur-3xl border border-white/10 hover:border-[#4169E1]/50 rounded-2xl overflow-hidden transition-all duration-500 shadow-2xl flex flex-col">
         
         {/* Mac-style Top Bar */}
-        <div className="bg-[#1a1a1a] px-5 py-4 border-b border-white/5 flex items-center justify-between">
+        <div className="bg-[#1a1a1a] px-5 py-4 border-b border-white/5 flex items-center">
           <div className="flex gap-2.5">
             <div className="w-3 h-3 rounded-full bg-[#FF5F56] shadow-inner" />
             <div className="w-3 h-3 rounded-full bg-[#FFBD2E] shadow-inner" />
             <div className="w-3 h-3 rounded-full bg-[#27C93F] shadow-inner" />
           </div>
-          <span 
-            style={{ fontFamily: "'JetBrains Mono', monospace" }} 
-            className="text-[9px] uppercase tracking-[0.2em] text-zinc-500 font-bold"
-          >
-            Terminal.log_{index + 1}
-          </span>
         </div>
 
         {/* Content Area */}
