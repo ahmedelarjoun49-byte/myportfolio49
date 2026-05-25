@@ -1,6 +1,9 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import { ChevronUp } from "lucide-react";
+import { ChevronUp, ArrowDown } from "lucide-react";
+import { Plus_Jakarta_Sans } from "next/font/google";
+
+const plusJakarta = Plus_Jakarta_Sans({ subsets: ["latin"] });
 
 const ScrollButtons = () => {
   const [showScrollUp, setShowScrollUp] = useState(false);
@@ -30,12 +33,12 @@ const ScrollButtons = () => {
 
   const scrollToSection = () => {
     window.scrollTo({ top: window.innerHeight * 0.9, behavior: "smooth" });
-    setShowScrollDown(false); // Hide Scroll Down button permanently
+    setShowScrollDown(false);
   };
 
   return (
-    <>
-      {/* --- SCROLL UP BUTTON (ROYALE BLUE) --- */}
+    <div className={plusJakarta.className}>
+      {/* --- SCROLL UP BUTTON --- */}
       <div
         className={`fixed bottom-8 right-8 z-50 transition-all duration-500 ${
           showScrollUp
@@ -45,39 +48,49 @@ const ScrollButtons = () => {
         onClick={scrollToTop}
       >
         <div className="relative group cursor-pointer">
-          {/* Outer Glow Effect */}
-          <div className="absolute -inset-1 bg-blue-600 rounded-full blur opacity-20 group-hover:opacity-60 transition duration-300" />
+          {/* Subtle Outer Blend (No aggressive artificial glow) */}
+          <div className="absolute -inset-px bg-blue-500 rounded-full opacity-0 group-hover:opacity-20 blur-sm transition-opacity duration-300" />
           
           {/* Main Button Body */}
-          <div className="relative bg-blue-600 w-14 h-14 rounded-full flex justify-center items-center shadow-[0_0_20px_rgba(37,99,235,0.3)] hover:shadow-[0_0_25px_rgba(37,99,235,0.5)] transition-all duration-300 hover:bg-blue-500 transform hover:scale-110 border border-blue-400/20">
-            <ChevronUp className="text-white w-6 h-6 group-hover:-translate-y-1 transition-transform duration-300" />
+          <div className="relative bg-[#0a0d14]/80 backdrop-blur-md w-12 h-12 rounded-full flex justify-center items-center border border-white/[0.06] hover:border-blue-500/40 transition-all duration-300 group-hover:scale-105">
+            <ChevronUp className="text-slate-400 w-5 h-5 group-hover:text-blue-400 group-hover:-translate-y-0.5 transition-all duration-300" />
           </div>
         </div>
       </div>
 
-      {/* --- SCROLL DOWN BUTTON (THEMED BLUE) --- */}
+      {/* --- SCROLL DOWN BUTTON --- */}
       <div
-        className={`fixed bottom-8 left-1/2 -translate-x-1/2 z-50 transition-all duration-500 ${
+        className={`fixed bottom-10 left-1/2 -translate-x-1/2 z-50 transition-all duration-500 ${
           showScrollDown
             ? "opacity-100 translate-y-0"
             : "opacity-0 translate-y-4 pointer-events-none"
         }`}
         onClick={scrollToSection}
       >
-        <div className="flex flex-col items-center cursor-pointer group">
-          {/* Animated Scroll Container */}
-          <div className="w-10 h-14 rounded-full border-2 border-blue-600/30 flex justify-center items-start p-2 relative overflow-hidden bg-black/40 backdrop-blur-md shadow-lg group-hover:border-blue-500/60 transition-all duration-300 group-hover:scale-105">
-            {/* The Mouse Scroller Dot */}
-            <div className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-bounce shadow-[0_0_8px_rgba(59,130,246,0.8)]"></div>
+        <div className="flex flex-col items-center cursor-pointer group relative h-10 overflow-hidden px-4">
+          {/* Sliding Text Element */}
+          <div className="flex flex-col items-center transition-transform duration-500 ease-[0.16,1,0.3,1] group-hover:-translate-y-7">
+            
+            {/* State 1: Passive view */}
+            <div className="flex items-center gap-1.5 h-7">
+              <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">
+                Défiler
+              </span>
+              <ArrowDown size={11} className="text-slate-500 animate-bounce" />
+            </div>
+
+            {/* State 2: Hover view */}
+            <div className="flex items-center gap-1.5 h-7">
+              <span className="text-[11px] font-semibold uppercase tracking-wider text-blue-400">
+                Explorer
+              </span>
+              <ArrowDown size={11} className="text-blue-400" />
+            </div>
+
           </div>
-          
-          {/* Scroll Text */}
-          <p className="text-blue-500/80 mt-3 text-[10px] font-black uppercase tracking-[0.2em] group-hover:text-blue-400 transition-colors duration-200 drop-shadow-sm">
-            Scroll down
-          </p>
         </div>
       </div>
-    </>
+    </div>
   );
 };
 

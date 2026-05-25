@@ -2,9 +2,11 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import React, { useEffect, useState, useMemo } from "react";
+import React, { useEffect, useState, useMemo, useRef } from "react";
 import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
-import { User, Mail, MessageSquare, Tag, Send, Loader2, CheckCircle2, AlertCircle } from "lucide-react";
+import { Plus_Jakarta_Sans } from "next/font/google";
+
+const plusJakarta = Plus_Jakarta_Sans({ subsets: ["latin"] });
 
 interface MenuProps {
   isContactVisible?: boolean;
@@ -12,8 +14,9 @@ interface MenuProps {
 
 export default function Menubar({ isContactVisible = false }: MenuProps) {
   const pathname = usePathname();
-  const [visible, setVisible] = useState(false);
+  const [visible, setVisible] = useState(true);
   const [mode, setMode] = useState<"light" | "dark">("dark");
+  const lastScrollY = useRef(0);
 
   const isActive = (href: string) => pathname === href;
   const isPreloader = pathname === "/preloader";
@@ -25,25 +28,25 @@ export default function Menubar({ isContactVisible = false }: MenuProps) {
     ...(isContactVisible ? [{ href: "/contact", label: "Contact" }] : []),
   ], [isContactVisible]);
 
-  // 1. Mouse Proximity & Mobile Logic
   useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
-      // Show if mouse is in the top 150px
-      setVisible(e.clientY < 150);
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+
+      if (currentScrollY <= 10) {
+        setVisible(true);
+      } else if (currentScrollY > lastScrollY.current) {
+        setVisible(false);
+      } else {
+        setVisible(true);
+      }
+
+      lastScrollY.current = currentScrollY;
     };
 
-    // Mobile: Always visible on touch devices
-    const isMobile = window.matchMedia("(pointer: coarse)").matches;
-    if (isMobile) {
-      setVisible(true);
-    } else {
-      window.addEventListener("mousemove", handleMouseMove);
-    }
-
-    return () => window.removeEventListener("mousemove", handleMouseMove);
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // 2. Theme & Drag Logic (Lamp Cord)
   const applyTheme = (next: "light" | "dark") => {
     const root = document.documentElement;
     root.classList.remove("light", "dark");
@@ -64,7 +67,7 @@ export default function Menubar({ isContactVisible = false }: MenuProps) {
   if (isPreloader) return null;
 
   return (
-    <>
+    <div className={plusJakarta.className}>
       {/* LAMP CORD */}
       <div className="fixed top-0 right-10 md:right-32 z-[99999999] flex flex-col items-center pointer-events-none touch-none">
         <div className="w-6 h-2 bg-zinc-800 dark:bg-zinc-200 rounded-b-sm shadow-2xl" />
@@ -84,27 +87,37 @@ export default function Menubar({ isContactVisible = false }: MenuProps) {
 
       {/* NAVBAR */}
       <motion.nav
-        className="fixed left-0 right-0 top-6 z-[999999] pointer-events-none"
+        className="fixed left-0 right-0 top-6 z-[999999] pointer-events-none flex justify-end max-w-5xl mx-auto px-6 md:px-12"
         animate={{ y: visible ? 0 : -110, opacity: visible ? 1 : 0 }}
-        transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+        transition={{ duration: 0.3, ease: [0.25, 1, 0.5, 1] }}
       >
-        <div className="pointer-events-auto mx-auto w-full max-w-4xl px-4">
-          <div className="flex items-center justify-between rounded-full border border-zinc-200/50 dark:border-white/10 bg-white/70 dark:bg-[#020617]/80 backdrop-blur-xl px-6 py-2.5 shadow-2xl">
-            <span className="text-sm font-black uppercase tracking-tighter">Ahmed El Arjoun.</span>
+        <div className="pointer-events-auto">
+          <div className="flex items-center rounded-full border border-zinc-200/50 dark:border-white/10 bg-white/70 dark:bg-[#020617]/80 backdrop-blur-xl px-4 py-2 shadow-2xl">
             <ul className="flex items-center gap-1">
               {items.map((it) => (
                 <li key={it.href} className="relative">
-                  <Link href={it.href} className={`px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest ${isActive(it.href) ? "text-blue-600 dark:text-blue-400" : "text-zinc-500"}`}>
-                    {isActive(it.href) && <motion.span layoutId="navPill" className="absolute inset-0 -z-10 rounded-full bg-blue-500/10 border border-blue-500/20" />}
+                  <Link 
+                    href={it.href} 
+                    className={`px-4 py-2 rounded-full text-[11px] font-medium uppercase tracking-wider transition-colors ${
+                      isActive(it.href) 
+                        ? "text-blue-600 dark:text-blue-400" 
+                        : "text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200"
+                    }`}
+                  >
+                    {isActive(it.href) && (
+                      <motion.span 
+                        layoutId="navPill" 
+                        className="absolute inset-0 -z-10 rounded-full bg-blue-500/10 border border-blue-500/20" 
+                      />
+                    )}
                     {it.label}
                   </Link>
                 </li>
               ))}
             </ul>
-            <a href="/cv.pdf" className="h-9 px-4 flex items-center bg-zinc-900 dark:bg-white text-white dark:text-black rounded-full text-[11px] font-black uppercase">CV</a>
           </div>
         </div>
       </motion.nav>
-    </>
+    </div>
   );
 }
