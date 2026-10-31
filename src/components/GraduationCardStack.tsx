@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useRef } from "react";
+import { useRef } from "react";
 import Image from "next/image";
 import {
   motion,
@@ -33,43 +33,42 @@ export default function GraduationParallaxHero({
   });
 
   const smoothProgress = useSpring(scrollYProgress, {
-    stiffness: 80,
-    damping: 25,
+    stiffness: 90,
+    damping: 30,
     restDelta: 0.001,
   });
 
   // --- Cinematic 3D Transforms ---
-  const photoZ = useTransform(smoothProgress, [0, 0.4], [0, -300]);
-  const photoScale = useTransform(smoothProgress, [0, 0.4], [1, 0.85]);
+  const photoZ = useTransform(smoothProgress, [0, 0.4], [0, -320]);
+  const photoScale = useTransform(smoothProgress, [0, 0.4], [1, 0.86]);
   const photoOpacity = useTransform(smoothProgress, [0.3, 0.5], [1, 0]);
-  const photoBlur = useTransform(smoothProgress, [0.2, 0.5], [0, 15]);
+  const photoBlur = useTransform(smoothProgress, [0.2, 0.5], [0, 12]);
 
-  const textZ = useTransform(smoothProgress, [0.3, 0.7], [300, 0]);
-  const textY = useTransform(smoothProgress, [0.3, 0.7], [150, 0]);
-  const textOpacity = useTransform(smoothProgress, [0.4, 0.6], [0, 1]);
-  const textScale = useTransform(smoothProgress, [0.3, 0.7], [0.9, 1]);
+  const textZ = useTransform(smoothProgress, [0.3, 0.7], [320, 0]);
+  const textY = useTransform(smoothProgress, [0.3, 0.7], [100, 0]);
+  const textOpacity = useTransform(smoothProgress, [0.38, 0.58], [0, 1]);
+  const textScale = useTransform(smoothProgress, [0.3, 0.7], [0.94, 1]);
 
-  const bgRotation = useTransform(smoothProgress, [0, 1], [0, 25]);
+  const bgRotation = useTransform(smoothProgress, [0, 1], [0, 15]);
 
   const lines = [
-    "Architecting the bridge between 3D visualization and modern web logic.",
-    "Specialized in high-performance React architectures and UI motion.",
-    "Turning complex technical foundations into seamless user experiences.",
+    "Bridging the gap between 3D visualization and modern web applications.",
+    "Specialized in high-performance React architectures and fluid UI motion.",
+    "Transforming complex engineering foundations into seamless experiences.",
   ];
 
   return (
     <section 
       ref={containerRef} 
-      className="relative h-[300vh] w-full bg-[#020617] antialiased overflow-hidden"
-      style={{ perspective: "1500px" }}
+      className="relative h-[300vh] w-full bg-[#030712] text-slate-100 antialiased overflow-hidden select-none"
+      style={{ perspective: "1600px" }}
     >
-      {/* Background Ambient Glow */}
+      {/* Subtle Ambient Background Glow */}
       <motion.div 
         style={{ rotate: bgRotation }}
-        className="fixed inset-0 z-0 flex items-center justify-center opacity-40 pointer-events-none"
+        className="fixed inset-0 z-0 flex items-center justify-center opacity-30 pointer-events-none"
       >
-        <div className="h-[800px] w-[800px] rounded-full bg-blue-600/10 blur-[150px]" />
-        <div className="absolute top-1/4 right-1/4 h-[400px] w-[400px] rounded-full bg-royal-blue-500/10 blur-[120px]" />
+        <div className="h-[700px] w-[700px] rounded-full bg-blue-600/10 blur-[140px]" />
       </motion.div>
 
       <div className="sticky top-0 h-screen w-full flex items-center justify-center">
@@ -82,24 +81,26 @@ export default function GraduationParallaxHero({
             opacity: photoOpacity,
             filter: useMotionTemplate`blur(${photoBlur}px)`,
           }}
-          className="absolute z-20 w-full max-w-[420px] px-6"
+          className="absolute z-20 w-full max-w-[400px] px-6"
         >
-          <div className="group relative aspect-[3/4.2] overflow-hidden rounded-[2.5rem] border border-blue-500/20 bg-zinc-900 shadow-[0_0_80px_rgba(37,99,235,0.2)]">
+          <div className="group relative aspect-[3/4] overflow-hidden rounded-[2rem] border border-white/10 bg-slate-900 shadow-2xl">
             <Image 
               src={src} 
               alt="Portrait" 
               fill 
-              className="object-cover transition-transform duration-1000 group-hover:scale-110" 
+              className="object-cover transition-transform duration-700 group-hover:scale-105" 
               priority 
             />
             
-            {/* Royal Blue Vignette/Gradient Overlay */}
-            <div className="absolute inset-0 bg-gradient-to-t from-blue-950/80 via-transparent to-transparent" />
+            {/* Clean Bottom Gradient Vignette */}
+            <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-transparent to-transparent" />
             
             {/* Floating Info Tag */}
-            <div className="absolute bottom-8 left-8 right-8 p-6 rounded-3xl border border-white/10 bg-black/40 backdrop-blur-md">
-              <p className="text-[10px] font-black tracking-[0.4em] text-blue-400 uppercase mb-2">Class of {year}</p>
-              <h2 className="text-white font-bold text-xl leading-tight uppercase tracking-tighter">
+            <div className="absolute bottom-6 left-6 right-6 p-5 rounded-2xl border border-white/10 bg-slate-950/60 backdrop-blur-xl">
+              <span className="text-[10px] font-mono tracking-[0.3em] text-blue-400 uppercase block mb-1">
+                Class of {year}
+              </span>
+              <h2 className="text-white font-medium text-sm sm:text-base leading-snug tracking-tight">
                 {subtitle}
               </h2>
             </div>
@@ -114,51 +115,53 @@ export default function GraduationParallaxHero({
             opacity: textOpacity,
             scale: textScale,
           }}
-          className="absolute z-50 w-full max-w-[650px] px-6"
+          className="absolute z-50 w-full max-w-[620px] px-6"
         >
-          <div className="relative overflow-hidden rounded-[3rem] border border-white/5 bg-zinc-950/60 p-10 lg:p-16 backdrop-blur-3xl shadow-[0_0_100px_rgba(0,0,0,0.5)]">
-            {/* Top Right Glow Accent */}
-            <div className="absolute -top-20 -right-20 h-64 w-64 bg-blue-600/20 blur-[100px]" />
+          <div className="relative overflow-hidden rounded-[2.5rem] border border-white/10 bg-slate-950/80 p-8 sm:p-12 backdrop-blur-2xl shadow-[0_0_80px_rgba(0,0,0,0.6)]">
             
-            <div className="relative space-y-10">
-              <div className="space-y-4">
-                <div className="flex items-center gap-4">
-                  <div className="h-[2px] w-12 bg-blue-600" />
-                  <span className="text-xs font-black tracking-[0.3em] text-blue-500 uppercase">Profile Strategy</span>
+            {/* Soft Corner Accent Light */}
+            <div className="absolute -top-20 -right-20 h-56 w-56 bg-blue-500/10 blur-[90px] pointer-events-none" />
+            
+            <div className="relative space-y-8">
+              
+              {/* Header Title Section */}
+              <div className="space-y-2">
+                <div className="flex items-center gap-3">
+                  <div className="h-1.5 w-1.5 rounded-full bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,1)]" />
+                  <span className="text-[11px] font-mono font-semibold tracking-[0.25em] text-blue-400 uppercase">
+                    Developer Profile
+                  </span>
                 </div>
-                <h3 className="text-5xl lg:text-7xl font-black text-white italic tracking-tighter leading-[0.9]">
-                  CREATIVE<br />
-                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-blue-600">DEVELOPER</span>
+                <h3 className="text-4xl sm:text-5xl font-black text-white tracking-tight leading-none pt-1">
+                  CREATIVE <br />
+                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-indigo-500">
+                    DEVELOPER
+                  </span>
                 </h3>
               </div>
 
-              <div className="space-y-6">
+              {/* Bullet Points */}
+              <div className="space-y-4">
                 {lines.map((line, i) => (
                   <motion.div
                     key={i}
-                    initial={{ opacity: 0, x: -30 }}
+                    initial={{ opacity: 0, x: -15 }}
                     animate={isInView ? { opacity: 1, x: 0 } : {}}
-                    transition={{ delay: 0.6 + i * 0.15, duration: 0.8 }}
-                    className="flex items-start gap-5 group"
+                    transition={{ delay: 0.4 + i * 0.1, duration: 0.6 }}
+                    className="flex items-start gap-3.5 text-slate-300 text-base sm:text-lg font-normal leading-relaxed"
                   >
-                    <div className="mt-2 h-2 w-2 rounded-full bg-blue-600 group-hover:scale-150 transition-transform duration-300 shadow-[0_0_10px_rgba(37,99,235,0.8)]" />
-                    <p className="text-zinc-300 text-lg lg:text-xl font-medium leading-relaxed">
-                      {line}
-                    </p>
+                    <span className="text-blue-500 font-mono text-sm mt-0.5">0{i + 1}.</span>
+                    <p>{line}</p>
                   </motion.div>
                 ))}
               </div>
 
-              {/* System Ready Indicator */}
-              <div className="flex items-center gap-6 pt-6 border-t border-white/5">
-                <div className="flex-1 h-[2px] bg-zinc-800 rounded-full overflow-hidden">
-                  <motion.div 
-                    style={{ width: useTransform(smoothProgress, [0.5, 1], ["0%", "100%"]) }}
-                    className="h-full bg-blue-600 shadow-[0_0_15px_rgba(37,99,235,1)]"
-                  />
-                </div>
-                <span className="text-[10px] font-mono text-zinc-500 uppercase tracking-[0.4em]">SYS_READY // V.2025</span>
+              {/* Progress Indicator */}
+              <div className="flex items-center justify-between pt-4 border-t border-white/5 text-[11px] font-mono text-slate-500 uppercase tracking-widest">
+                <span>System Ready</span>
+                <span className="text-blue-400">V.{year}</span>
               </div>
+
             </div>
           </div>
         </motion.div>

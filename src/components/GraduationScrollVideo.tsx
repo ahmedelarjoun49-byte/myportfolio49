@@ -42,7 +42,10 @@ export default function GraduationRoyaleHero() {
                 alt="Logo"
                 fill
                 className="object-contain brightness-200"
-                onError={(e) => (e.currentTarget.style.display = 'none')}
+                onError={(e) => {
+                  const target = e.currentTarget as HTMLImageElement;
+                  target.style.display = 'none';
+                }}
               />
             </div>
 
@@ -66,22 +69,27 @@ export default function GraduationRoyaleHero() {
               viewport={{ once: false, amount: 0.3 }}
               transition={{ duration: 0.8, delay: 0.1, ease: "easeOut" }}
             >
-              <h1 className="text-6xl md:text-8xl font-serif text-white leading-[1.1] tracking-tight mb-8">
-                Licence <br />
-                <span className="italic font-light text-blue-400 drop-shadow-sm">
-                  Multimédia 3D
-                </span>
-              </h1>
+              {/* Professional Editorial Typography Header */}
+              <div className="mb-8">
+                <h1 className="text-5xl md:text-7xl font-serif tracking-tight leading-none">
+                  <span className="bg-gradient-to-r from-[#fef08a] via-[#d4af37] to-[#ca8a04] bg-clip-text text-transparent font-medium tracking-normal drop-shadow-[0_2px_10px_rgba(212,175,55,0.15)]">
+                    Licence
+                  </span>
+                  <span className="block mt-3 text-3xl md:text-5xl font-light italic font-serif text-zinc-300">
+                    Multimédia <span className="text-blue-400 not-italic font-sans font-medium tracking-wide">3D</span>
+                  </span>
+                </h1>
+              </div>
 
               <div className="space-y-8">
-                {/* Academic Quote */}
+                {/* Academic Quote in French */}
                 <motion.p 
                   initial={{ opacity: 0, x: 20 }}
                   whileInView={{ opacity: 1, x: 0 }}
                   transition={{ duration: 0.6, delay: 0.3 }}
-                  className="text-white text-xl md:text-2xl font-serif leading-relaxed italic border-l-4 border-blue-500 pl-8 max-w-xl"
+                  className="text-white text-xl md:text-2xl font-serif leading-relaxed italic border-l-2 border-blue-500/80 pl-6 max-w-xl text-zinc-200"
                 >
-                  "The intersection of spatial design and digital logic."
+                  &quot;À l&apos;intersection du design spatial et de la logique numérique.&quot;
                 </motion.p>
                 
                 <motion.div 
@@ -91,11 +99,8 @@ export default function GraduationRoyaleHero() {
                    className="h-px bg-blue-500/40" 
                 />
 
-                <p className="text-zinc-100 text-lg md:text-xl leading-relaxed font-sans font-light max-w-2xl">
-                  This achievement represents three pivotal years of discipline. By merging 
-                  <span className="text-white font-semibold"> 3D Visualization</span> with 
-                  <span className="text-white font-semibold text-blue-200"> Web Engineering</span>, 
-                  I have built a foundation that treats every interface as a living, immersive experience.
+                <p className="text-zinc-300 text-lg md:text-xl leading-relaxed font-sans font-light max-w-2xl">
+                  Fondé sur <span className="text-white font-medium">2 années de bases en développement web</span>, ce parcours combine la rigueur technique avec l&apos;univers de la création vidéoludique et du monde de la <span className="text-white font-medium text-blue-300">3D</span>.
                 </p>
               </div>
             </motion.div>

@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
-import { Download, ArrowUpRight, X, Github, Linkedin, Instagram, MessageCircle } from "lucide-react";
+import { FileText, ArrowUpRight, X, Github, Linkedin, Instagram, MessageCircle } from "lucide-react";
 import { Typewriter } from "react-simple-typewriter";
 import gsap from "gsap";
 
@@ -77,6 +77,10 @@ const CustomCursor = () => {
 export default function HomeClient() {
   const [showCV, setShowCV] = useState(false);
   const [showSocials, setShowSocials] = useState(false);
+  
+  const [isCVExpanded, setIsCVExpanded] = useState(true);
+  const [isHovered, setIsHovered] = useState(false);
+  const loopTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   const closeModals = useCallback(() => {
     setShowCV(false);
@@ -90,6 +94,37 @@ export default function HomeClient() {
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [closeModals]);
+
+  // Continuous loop: 5s visible, 2s hidden with smooth lighting glow
+  useEffect(() => {
+    if (isHovered) return;
+
+    const runLoop = () => {
+      setIsCVExpanded(true); // Show for 5s
+      loopTimerRef.current = setTimeout(() => {
+        setIsCVExpanded(false); // Hide for 2s
+        loopTimerRef.current = setTimeout(() => {
+          runLoop();
+        }, 2000);
+      }, 5000);
+    };
+
+    runLoop();
+
+    return () => {
+      if (loopTimerRef.current) clearTimeout(loopTimerRef.current);
+    };
+  }, [isHovered]);
+
+  const handleMouseEnter = () => {
+    setIsHovered(true);
+    if (loopTimerRef.current) clearTimeout(loopTimerRef.current);
+    setIsCVExpanded(true);
+  };
+
+  const handleMouseLeave = () => {
+    setIsHovered(false);
+  };
 
   return (
     <div className="transition-colors duration-300 selection:bg-blue-500/30 lg:cursor-none bg-black min-h-screen">
@@ -123,13 +158,10 @@ export default function HomeClient() {
                   </h2>
 
                   <div className="relative overflow-visible">
-                    <h1 className="text-6xl md:text-7xl lg:text-8xl font-black leading-tight tracking-tighter text-white">
-                      <span className="inline-block text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-indigo-400 to-blue-600 drop-shadow-[0_0_35px_rgba(37,99,235,0.4)] pr-2">
-                        Web
-                      </span>
+                    <h1 className="text-4xl md:text-5xl lg:text-6xl font-black leading-tight tracking-tighter text-white">
                       <div className="min-h-[1.1em] leading-snug">
                         <Typewriter
-                          words={["Junior Dev", "Multimedia Developer"]}
+                          words={["Web Developer", "3d animator"]}
                           loop={0}
                           cursor
                           cursorStyle="|"
@@ -143,31 +175,47 @@ export default function HomeClient() {
                       style={{ fontFamily: "'Imperial Script', cursive" }}
                       className="text-4xl md:text-5xl tracking-normal normal-case opacity-90 mt-1 text-blue-400 lowercase drop-shadow-[0_0_20px_rgba(65,105,225,0.4)]"
                     >
-                      & multimedia 3d
+                      & multimedia 3D
                     </div>
                   </div>
                 </motion.div>
 
+                {/* Description with Luminous Gold "Master" using same font styling */}
                 <motion.p variants={{ hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0 } }} className="text-base md:text-lg text-white/50 max-w-xl mx-auto lg:mx-0 leading-relaxed">
-                  A versatile <span className="text-white/80 font-medium">Full-Stack Junior Developer</span> and <span className="text-white/80 font-medium">IoT student</span>, blending technical engineering with creative <span className="text-blue-400">Multimedia 3D</span> expertise.
+                  A passionate <span className="text-[#fbbf24] font-semibold drop-shadow-[0_0_10px_rgba(251,191,36,0.5)]">Master</span> student specializing in <span className="text-white/90 font-medium">IoT & App Development</span>, blending robust engineering with creative <span className="text-blue-400">Multimedia 3D</span> expertise.
                 </motion.p>
 
-                <motion.div variants={{ hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0 } }} className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start pt-4">
+                {/* Redesigned Modern Borderless Actions */}
+                <motion.div variants={{ hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0 } }} className="flex flex-row items-center gap-8 justify-center lg:justify-start pt-4">
                   
+                  {/* Primary Action: Get In Touch (Borderless text link with arrow) */}
                   <button 
                     onClick={() => setShowSocials(true)} 
-                    className="group relative px-9 py-4 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-extrabold tracking-wider text-[12px] uppercase shadow-[0_0_25px_rgba(37,99,235,0.3)] hover:shadow-[0_0_40px_rgba(65,105,225,0.6)] flex items-center justify-center gap-2 transition-all duration-300 hover:scale-[1.03] active:scale-[0.98]"
+                    className="group relative py-2 text-white font-medium text-xs tracking-[0.2em] uppercase flex items-center gap-2 transition-all duration-300 hover:text-blue-400 active:scale-[0.98]"
                   >
-                    Get In Touch 
-                    <ArrowUpRight size={15} className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform duration-300" />
+                    <span>Get In Touch</span>
+                    <ArrowUpRight size={14} className="text-blue-400 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform duration-300" />
+                    <span className="absolute bottom-0 left-0 w-0 h-[1px] bg-blue-400 transition-all duration-300 group-hover:w-full" />
                   </button>
 
+                  {/* Secondary Action: View CV with Smooth Breathing Gold Lighting */}
                   <button 
                     onClick={() => setShowCV(true)} 
-                    className="group px-9 py-4 rounded-xl border border-white/10 bg-white/[0.03] backdrop-blur-md text-zinc-300 font-bold tracking-wider text-[12px] uppercase flex items-center justify-center gap-2 hover:bg-white/10 hover:border-white/20 hover:text-white transition-all duration-300 active:scale-[0.98]"
+                    onMouseEnter={handleMouseEnter}
+                    onMouseLeave={handleMouseLeave}
+                    className="group relative py-2 flex items-center gap-2 text-zinc-400 hover:text-white transition-all duration-300 active:scale-[0.98]"
+                    aria-label="View CV"
                   >
-                    <Download size={15} className="group-hover:translate-y-0.5 transition-transform duration-300" /> 
-                    View CV
+                    <div className="p-2 rounded-full bg-white/[0.03] group-hover:bg-white/10 transition-colors duration-300">
+                      <FileText size={18} className="text-[#fbbf24] animate-smooth-glow transition-all duration-1000 ease-in-out" />
+                    </div>
+                    <span 
+                      className={`overflow-hidden whitespace-nowrap text-xs tracking-[0.2em] uppercase font-semibold text-[#fbbf24] animate-smooth-glow transition-all duration-1000 ease-in-out ${
+                        isCVExpanded ? "max-w-[120px] opacity-100" : "max-w-0 opacity-0"
+                      }`}
+                    >
+                      View CV
+                    </span>
                   </button>
 
                 </motion.div>
@@ -244,6 +292,20 @@ export default function HomeClient() {
           50% { opacity: 0.35; } 
         }
         .animate-pulse-slow { animation: pulse-slow 8s infinite ease-in-out; }
+
+        @keyframes smoothGlow {
+          0%, 100% { 
+            color: #d97706; /* deeper amber gold */
+            text-shadow: 0 0 4px rgba(251,191,36,0.3);
+          }
+          50% { 
+            color: #fbbf24; /* luminous gold */
+            text-shadow: 0 0 12px rgba(251,191,36,0.8);
+          }
+        }
+        .animate-smooth-glow {
+          animation: smoothGlow 3s infinite ease-in-out;
+        }
         
         .profile-mask {
           mask-image: linear-gradient(to bottom, 
